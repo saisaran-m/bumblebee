@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy | Bumblebee Offline Mesh Chat</title>
+  <meta name="description" content="Privacy Policy for Bumblebee. 100% offline, air-gapped peer-to-peer communication with zero cloud servers, zero trackers, and zero telemetry." />
+  <meta name="theme-color" content="#070809" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%2232%22%20height=%2232%22><text y=%2226%22 font-size=%2226%22>🐝</text></svg>" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              honey: '#F5C542',
+              honeyDark: '#D9A726',
+              lavender: '#9B7EDE',
+              lavenderDark: '#7C5CBF',
+              darkBg: '#070809',
+              cardBg: '#0F1015',
+              cardBorder: '#1F212A',
+              subtleText: '#94A3B8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- External Design System CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[#070809] text-white font-sans antialiased selection:bg-brand-honey selection:text-black min-h-screen bg-mesh-grid relative">
+
+  <!-- ==================== TOP NAVIGATION ==================== -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-[#070809]/90 backdrop-blur-md border-b border-[#1C1D24]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-[#14151B] border border-[#262833] flex items-center justify-center text-xl shadow-inner group-hover:border-brand-honey transition-colors">
+          🐝
+        </div>
+        <div>
+          <span class="font-bold text-lg tracking-tight text-white group-hover:text-brand-honey transition-colors">Bumblebee</span>
+          <span class="text-[10px] font-mono tracking-widest uppercase block text-brand-honey -mt-1 font-semibold">100% Offline P2P</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="flex items-center gap-4 text-sm font-medium">
+        <a href="index.html" class="text-brand-subtleText hover:text-white transition-colors flex items-center gap-1.5">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>Back to Home</span>
+        </a>
+        <a href="terms.html" class="text-brand-subtleText hover:text-white transition-colors hidden sm:inline-block">
+          Terms of Service
+        </a>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="pt-32 pb-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    
+    <!-- Header -->
+    <div class="mb-12">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-mono text-emerald-400 uppercase tracking-wider mb-4">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+        Air-Gapped Privacy Architecture
+      </div>
+      <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight">
+        Privacy Policy
+      </h1>
+      <p class="mt-3 text-brand-subtleText text-base font-mono">
+        Last updated: October 18, 2026 • Effective immediately
+      </p>
+    </div>
+
+    <!-- Summary Box -->
+    <div class="bento-card p-6 sm:p-8 mb-10 border-brand-honey/30 bg-gradient-to-r from-[#141620] to-[#0E1018]">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-brand-honey/10 border border-brand-honey/20 text-brand-honey flex items-center justify-center shrink-0 text-xl">
+          🔒
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-white">Summary for Humans</h2>
+          <p class="mt-2 text-sm text-zinc-300 leading-relaxed">
+            Bumblebee is built on a simple principle: <strong>what happens on your device stays on your device</strong>. We have no user accounts, no cloud databases, no analytics trackers, and zero telemetry. When you chat with someone, your messages travel directly through physical radio waves (Bluetooth Low Energy and Wi-Fi Direct) to their phone. We cannot read your chats, track your location, or sell your data—because we literally possess no servers to collect it.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Policy Sections -->
+    <div class="space-y-10 text-zinc-300 leading-relaxed text-sm sm:text-base">
+
+      <!-- Section 1 -->
+      <section class="bento-card p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-4">
+          <span class="text-brand-honey font-mono text-base">01.</span>
+          Information We Do NOT Collect
+        </h2>
+        <p class="mb-4">
+          Unlike centralized cloud messengers, Bumblebee operates in a 100% air-gapped capacity:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-zinc-400 pl-2">
+          <li><strong>No Personal Identifiers:</strong> We do not collect names, email addresses, phone numbers, or social media logins.</li>
+          <li><strong>No Device Identifiers:</strong> We do not collect IMEI, MAC addresses, Android Advertising ID (GAID), or hardware serial numbers.</li>
+          <li><strong>No Telemetry or Crash Reports:</strong> The app does not include Firebase, Google Analytics, Sentry, Mixpanel, or any third-party tracking SDKs.</li>
+          <li><strong>No Cloud Message Backups:</strong> Messages and media are never stored or routed through cloud servers or proxy relays.</li>
+        </ul>
+      </section>
+
+      <!-- Section 2 -->
+      <section class="bento-card p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-4">
+          <span class="text-brand-honey font-mono text-base">02.</span>
+          Android System Permissions & Why We Need Them
+        </h2>
+        <p class="mb-4">
+          Bumblebee requests only the physical hardware permissions necessary to discover nearby devices and transfer messages over local radio:
+        </p>
+        
+        <div class="space-y-4">
+          <div class="p-4 rounded-xl bg-[#090A0E] border border-[#1E202B]">
+            <div class="font-mono text-xs text-brand-honey font-bold mb-1">
+              BLUETOOTH_SCAN, BLUETOOTH_ADVERTISE, BLUETOOTH_CONNECT
+            </div>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Required by Android to broadcast service discovery UUIDs and discover other Bumblebee devices in physical proximity.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-[#090A0E] border border-[#1E202B]">
+            <div class="font-mono text-xs text-brand-honey font-bold mb-1">
+              ACCESS_FINE_LOCATION & ACCESS_COARSE_LOCATION
+            </div>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Mandated by Android OS security policy to permit radio scanning (Bluetooth Low Energy and Wi-Fi Direct). Bumblebee uses this permission solely to discover neighboring devices. Your geographic coordinates are <strong>never</strong> recorded, monitored, or transmitted anywhere unless you explicitly tap "Send SOS".
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-[#090A0E] border border-[#1E202B]">
+            <div class="font-mono text-xs text-brand-honey font-bold mb-1">
+              NEARBY_WIFI_DEVICES (Android 13+) & ACCESS_WIFI_STATE
+            </div>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Used to establish direct ad-hoc Wi-Fi Direct connections between handsets for transferring high-resolution photos and voice memos at speeds up to 250 Mbps without an external router or internet.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-[#090A0E] border border-[#1E202B]">
+            <div class="font-mono text-xs text-brand-honey font-bold mb-1">
+              RECORD_AUDIO
+            </div>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Used solely when you press and hold the Push-To-Talk (Walkie-Talkie) microphone button to record offline AAC voice memos. Audio is encoded locally and streamed directly to your connected peer.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-[#090A0E] border border-[#1E202B]">
+            <div class="font-mono text-xs text-brand-honey font-bold mb-1">
+              POST_NOTIFICATIONS & FOREGROUND_SERVICE_CONNECTED_DEVICE
+            </div>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Allows the app to keep the radio listener alive in the background and notify you when a nearby peer sends you an offline message or emergency alert.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3 -->
+      <section class="bento-card p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-4">
+          <span class="text-brand-honey font-mono text-base">03.</span>
+          Emergency SOS Telemetry Disclosure
+        </h2>
+        <p class="mb-3">
+          Bumblebee includes an Emergency SOS Beacon designed for search-and-rescue and disaster scenarios. When you <strong>explicitly trigger</strong> an Emergency SOS:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-zinc-400 pl-2">
+          <li>The app queries your phone's hardware GPS satellite receiver for your last known latitude, longitude, and accuracy.</li>
+          <li>The app queries the battery manager for your current hardware battery percentage.</li>
+          <li>This distress packet is broadcast over radio waves to all listening devices within range.</li>
+          <li><strong>Disclosure:</strong> Because this is an emergency distress broadcast, GPS coordinates and battery levels are broadcast in plaintext over the radio so any nearby rescuer can locate you immediately.</li>
+        </ul>
+      </section>
+
+      <!-- Section 4 -->
+      <section class="bento-card p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-4">
+          <span class="text-brand-honey font-mono text-base">04.</span>
+          Data Storage & Security
+        </h2>
+        <p class="mb-3">
+          All data generated inside the app is protected by standard Android OS security:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-zinc-400 pl-2">
+          <li><strong>Local Sandbox:</strong> Messages and peer profiles are stored in a private Room SQLite database at <code class="text-zinc-200">/data/data/com.bumblebee.chat/databases/</code>, protected by Android Linux UID process isolation. No other app on your device can read this data.</li>
+          <li><strong>UKEY2 Mutual Authentication:</strong> Peer connection sessions are authenticated using UKEY2 Elliptic-Curve Diffie-Hellman handshakes, verified visually via 4-digit Short Authentication String (SAS) matching codes.</li>
+          <li><strong>Total Erasure:</strong> Navigating to Settings ➔ "Reset Session" purges all local messages and peer records immediately. Uninstalling the app permanently destroys all local databases.</li>
+        </ul>
+      </section>
+
+      <!-- Section 5 -->
+      <section class="bento-card p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-4">
+          <span class="text-brand-honey font-mono text-base">05.</span>
+          Third-Party Services
+        </h2>
+        <p>
+          Bumblebee communicates using Google Play Services Nearby Connections API. The Nearby Connections framework negotiates local physical radio protocols on Android. No user messages, chat contents, or voice recordings are sent to Google cloud servers.
+        </p>
+      </section>
+
+      <!-- Section 6 -->
+      <section class="bento-card p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-4">
+          <span class="text-brand-honey font-mono text-base">06.</span>
+          Open Source Verification
+        </h2>
+        <p>
+          Bumblebee is 100% open-source under the MIT License. Anyone can audit the source code, verify that no network requests leave your phone to cloud servers, and compile the app independently from GitHub:
+        </p>
+        <div class="mt-4">
+          <a href="https://github.com/saisaran-m/bumblebee" target="_blank" rel="noopener noreferrer"
+             class="inline-flex items-center gap-2 text-xs font-mono text-brand-honey hover:underline">
+            <span>https://github.com/saisaran-m/bumblebee →</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Section 7 -->
+      <section class="bento-card p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-4">
+          <span class="text-brand-honey font-mono text-base">07.</span>
+          Contact & Inquiries
+        </h2>
+        <p>
+          If you have any questions or security inquiries regarding this Privacy Policy, please open an issue on GitHub or contact the maintainer:
+        </p>
+        <p class="mt-2 text-zinc-400 font-mono text-xs">
+          Maintainer: Saisaran M<br />
+          Project Repository: <a href="https://github.com/saisaran-m/bumblebee" class="text-brand-honey hover:underline">github.com/saisaran-m/bumblebee</a>
+        </p>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-[#171820] py-12 bg-[#050608]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-[#14151B] border border-[#262833] flex items-center justify-center text-base">
+          🐝
+        </div>
+        <span class="font-bold text-white text-base">Bumblebee</span>
+        <span class="text-xs text-brand-subtleText">• 100% Offline P2P Mesh Communication</span>
+      </div>
+
+      <div class="flex items-center gap-6 text-sm text-brand-subtleText">
+        <a href="index.html" class="hover:text-white transition-colors">Home</a>
+        <a href="privacy.html" class="text-brand-honey transition-colors">Privacy Policy</a>
+        <a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a>
+        <a href="https://github.com/saisaran-m/bumblebee" class="hover:text-white transition-colors">GitHub</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
