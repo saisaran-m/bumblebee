@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bumblebee | 100% Offline Peer-to-Peer Mesh Chat for Android</title>
+  <meta name="description" content="Chat, send voice memos, stream HD photos, and broadcast emergency SOS beacons without internet, SIM cards, cellular data, or Wi-Fi routers." />
+  <meta name="theme-color" content="#070809" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%2232%22%20height=%2232%22><text y=%2226%22 font-size=%2226%22>🐝</text></svg>" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              honey: '#F5C542',
+              honeyDark: '#D9A726',
+              lavender: '#9B7EDE',
+              lavenderDark: '#7C5CBF',
+              darkBg: '#070809',
+              cardBg: '#0F1015',
+              cardBorder: '#1F212A',
+              subtleText: '#94A3B8',
+            }
+          },
+          animation: {
+            'radar-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'radar-ripple': 'ripple 3.5s linear infinite',
+            'float': 'float 5s ease-in-out infinite',
+          },
+          keyframes: {
+            ripple: {
+              '0%': { transform: 'scale(0.8)', opacity: '0.8' },
+              '100%': { transform: 'scale(2.2)', opacity: '0' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070809;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1F212A;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9B7EDE;
+    }
+
+    /* Radar Background Ripples */
+    .radar-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(245, 197, 66, 0.08);
+      pointer-events: none;
+    }
+
+    .glow-honey {
+      box-shadow: 0 0 35px -5px rgba(245, 197, 66, 0.25);
+    }
+
+    .glow-lavender {
+      box-shadow: 0 0 35px -5px rgba(155, 126, 222, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-[#070809] text-white font-sans antialiased selection:bg-brand-honey selection:text-black min-h-screen">
+
+  <!-- ==================== TOP NAVIGATION ==================== -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-[#070809]/85 backdrop-blur-md border-b border-[#1C1D24]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-[#14151B] border border-[#262833] flex items-center justify-center text-xl shadow-inner group-hover:border-brand-honey transition-colors">
+          🐝
+        </div>
+        <div class="flex flex-col">
+          <span class="font-bold text-lg tracking-tight text-white flex items-center gap-1.5">
+            Bumblebee
+            <span class="text-[10px] font-mono uppercase bg-brand-honey/10 text-brand-honey px-1.5 py-0.5 rounded border border-brand-honey/20">v1.0.0</span>
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Links -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-brand-subtleText">
+        <a href="#simulator" class="hover:text-white transition-colors">Live Sim</a>
+        <a href="#features" class="hover:text-white transition-colors">Features</a>
+        <a href="#screenshots" class="hover:text-white transition-colors">Screenshots</a>
+        <a href="#architecture" class="hover:text-white transition-colors">Architecture</a>
+        <a href="#setup" class="hover:text-white transition-colors">Setup</a>
+        <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
+      </nav>
+
+      <!-- Right CTAs -->
+      <div class="flex items-center gap-3">
+        <a href="https://github.com/saisaran-m/bumblebee" target="_blank" rel="noopener noreferrer" 
+           class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#14151B] border border-[#262833] text-zinc-300 hover:text-white hover:border-[#383A49] transition-all">
+          <i data-lucide="star" class="w-3.5 h-3.5 text-brand-honey fill-brand-honey"></i>
+          <span>Star</span>
+        </a>
+
+        <a href="https://github.com/saisaran-m/bumblebee/releases/download/v1.0.0/bumblebee.apk"
+           class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-brand-honey text-black hover:bg-brand-honeyDark active:scale-95 transition-all shadow-sm">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Download</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== HERO SECTION ==================== -->
+  <section class="relative pt-32 pb-20 sm:pt-40 sm:pb-28 overflow-hidden">
+    
+    <!-- Radar Ripple Background Animation -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+      <div class="radar-ring w-[320px] h-[320px] animate-radar-slow"></div>
+      <div class="radar-ring w-[540px] h-[540px]"></div>
+      <div class="radar-ring w-[780px] h-[780px]"></div>
+      <div class="radar-ring w-[1020px] h-[1020px]"></div>
+    </div>
+
+    <!-- Radial Glow Spotlights -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-brand-honey/10 blur-[130px] rounded-full pointer-events-none"></div>
+    <div class="absolute top-1/3 left-1/3 w-[400px] h-[300px] bg-brand-lavender/10 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
+      
+      <!-- Air-Gap Badge -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121319] border border-[#242633] text-xs font-medium text-zinc-300 mb-8 animate-float">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span class="text-zinc-200 font-semibold">100% Offline P2P Mesh</span>
+        <span class="text-zinc-500">•</span>
+        <span class="text-brand-subtleText">Zero SIM / Zero Cloud</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.08] text-white">
+        Chat with neighbors.<br />
+        <span class="text-brand-honey">No internet.</span>
+      </h1>
+
+      <!-- Description -->
+      <p class="mt-8 text-lg sm:text-xl text-brand-subtleText max-w-2xl leading-relaxed">
+        Bumblebee turns Android smartphones into an off-grid peer-to-peer mesh network using Bluetooth Low Energy and Wi-Fi Direct. Send instant messages, crystal-clear 1280px HD photos, push-to-talk voice walkie-talkies, and emergency SOS beacons with zero data, zero cell signal, and zero servers.
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="mt-10 flex flex-wrap items-center gap-4 justify-center sm:justify-start">
+        <!-- Download APK Button -->
+        <a href="https://github.com/saisaran-m/bumblebee/releases/download/v1.0.0/bumblebee.apk"
+           class="flex items-center gap-3 px-6 py-3.5 rounded-xl bg-brand-honey text-black font-extrabold text-base hover:bg-brand-honeyDark active:scale-95 transition-all glow-honey">
+          <i data-lucide="download" class="w-5 h-5 stroke-[2.5]"></i>
+          <span>Download APK</span>
+        </a>
+
+        <!-- Setup Guide Button -->
+        <a href="#setup" 
+           class="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#12131A] border border-[#272936] text-white font-semibold text-base hover:border-brand-lavender hover:bg-[#181A22] active:scale-95 transition-all">
+          <span>Setup Guide</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 text-brand-lavender"></i>
+        </a>
+
+        <!-- Interactive Simulator Button -->
+        <a href="#simulator" 
+           class="flex items-center gap-2 px-5 py-3.5 rounded-xl bg-[#12131A] border border-[#272936] text-zinc-300 font-semibold text-sm hover:border-zinc-500 transition-all">
+          <i data-lucide="radio" class="w-4 h-4 text-emerald-400"></i>
+          <span>Live Radio Sim</span>
+        </a>
+
+        <!-- Star on GitHub -->
+        <a href="https://github.com/saisaran-m/bumblebee" target="_blank" rel="noopener noreferrer"
+           class="flex items-center gap-2 px-5 py-3.5 rounded-xl bg-[#12131A] border border-[#272936] text-zinc-300 font-semibold text-sm hover:border-zinc-500 transition-all">
+          <i data-lucide="star" class="w-4 h-4 text-brand-honey fill-brand-honey"></i>
+          <span>Star on GitHub</span>
+        </a>
+      </div>
+
+      <!-- Quick Metrics Strip -->
+      <div class="mt-16 pt-8 border-t border-[#1A1C24] grid grid-cols-2 sm:grid-cols-4 gap-6 text-center sm:text-left">
+        <div>
+          <div class="text-2xl sm:text-3xl font-extrabold text-white">0%</div>
+          <div class="text-xs uppercase tracking-wider font-semibold text-brand-subtleText mt-1">Data / Internet Used</div>
+        </div>
+        <div>
+          <div class="text-2xl sm:text-3xl font-extrabold text-brand-honey">100m+</div>
+          <div class="text-xs uppercase tracking-wider font-semibold text-brand-subtleText mt-1">Direct Radio Range</div>
+        </div>
+        <div>
+          <div class="text-2xl sm:text-3xl font-extrabold text-brand-lavender">1280px</div>
+          <div class="text-xs uppercase tracking-wider font-semibold text-brand-subtleText mt-1">Crisp HD Photo Chunking</div>
+        </div>
+        <div>
+          <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400">100%</div>
+          <div class="text-xs uppercase tracking-wider font-semibold text-brand-subtleText mt-1">Air-Gapped & Private</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== LIVE INTERACTIVE P2P SIMULATOR ==================== -->
+  <section id="simulator" class="py-20 border-t border-[#1C1D24] bg-[#0A0B0F]/70 relative">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-lavender/10 border border-brand-lavender/20 text-xs font-mono text-brand-lavender uppercase tracking-wider mb-4">
+          <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+          Virtual Air-Gap Testbench
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+          Simulate Bumblebee P2P in your browser
+        </h2>
+        <p class="mt-3 text-brand-subtleText text-base">
+          Experience how Bumblebee's multi-chunk Nectar engine and mutual 4-digit PIN authentication transmit packets over pure device radio without internet.
+        </p>
+      </div>
+
+      <!-- Simulator Board -->
+      <div class="bg-[#0E1016] border border-[#20222D] rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        
+        <!-- Controls Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#1E202B]">
+          <div class="flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-sm font-semibold text-white">Carrier: <span class="font-mono text-brand-honey">Wi-Fi Direct (Direct P2P Link)</span></span>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-mono text-brand-subtleText">Airplane Mode:</span>
+            <button id="toggleAirplane" onclick="toggleAirplaneMode()" 
+                    class="px-3 py-1 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all">
+              Airplane Mode: ON (Air-Gapped)
+            </button>
+          </div>
+        </div>
+
+        <!-- Two Virtual Phones -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+          
+          <!-- Phone A -->
+          <div class="bg-[#13151D] border border-[#242634] rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-[#20222F]">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-brand-lavender/20 border border-brand-lavender/40 flex items-center justify-center text-sm">
+                    🐝
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">Device A (You)</h4>
+                    <span class="text-[11px] font-mono text-brand-subtleText">ID: #BEE-8821</span>
+                  </div>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">LINK READY</span>
+              </div>
+
+              <!-- Message History inside Device A -->
+              <div id="phoneAMessages" class="h-48 overflow-y-auto my-4 space-y-3 p-2 bg-[#090A0E] rounded-xl border border-[#1A1C24] font-sans text-xs">
+                <div class="text-center text-zinc-600 text-[11px] my-1">--- Mutual 4-digit PIN #4812 Authenticated ---</div>
+                <div class="flex justify-end">
+                  <div class="bg-brand-lavenderDark/40 text-purple-100 rounded-xl px-3 py-2 max-w-[80%] border border-brand-lavender/30">
+                    Hey Sarah! Cell towers are down at the campsite.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Input area -->
+            <div class="flex gap-2 pt-2">
+              <input id="simInput" type="text" placeholder="Type an offline message..." 
+                     class="flex-1 bg-[#090A0E] border border-[#232532] text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-brand-honey font-sans"
+                     onkeydown="if(event.key==='Enter') sendSimMessage()" />
+              <button onclick="sendSimVoice()" title="Send Walkie-Talkie Voice" 
+                      class="px-3 py-2.5 bg-[#1F212E] hover:bg-[#2B2D3D] text-brand-honey rounded-xl border border-[#2E3142] transition-colors">
+                <i data-lucide="mic" class="w-4 h-4"></i>
+              </button>
+              <button onclick="sendSimMessage()" 
+                      class="px-4 py-2.5 bg-brand-honey text-black font-bold text-xs rounded-xl hover:bg-brand-honeyDark active:scale-95 transition-all">
+                Send
+              </button>
+            </div>
+          </div>
+
+          <!-- Phone B -->
+          <div class="bg-[#13151D] border border-[#242634] rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-[#20222F]">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-sm">
+                    🌸
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">Device B (Sarah)</h4>
+                    <span class="text-[11px] font-mono text-brand-subtleText">ID: #PEER-3049</span>
+                  </div>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">HOP 0 (DIRECT)</span>
+              </div>
+
+              <!-- Message History inside Device B -->
+              <div id="phoneBMessages" class="h-48 overflow-y-auto my-4 space-y-3 p-2 bg-[#090A0E] rounded-xl border border-[#1A1C24] font-sans text-xs">
+                <div class="text-center text-zinc-600 text-[11px] my-1">--- Mutual 4-digit PIN #4812 Authenticated ---</div>
+                <div class="flex justify-start">
+                  <div class="bg-[#1C1E29] text-zinc-200 rounded-xl px-3 py-2 max-w-[80%] border border-[#282B3B]">
+                    Hey Sarah! Cell towers are down at the campsite.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Radio Packet Inspector -->
+            <div class="bg-[#090A0E] border border-[#1E202B] rounded-xl p-3 text-[11px] font-mono text-brand-subtleText">
+              <div class="flex justify-between items-center text-zinc-400 mb-1">
+                <span>Packet Wire Trace:</span>
+                <span id="packetStatus" class="text-emerald-400">ACK_DELIVERED (0ms latency)</span>
+              </div>
+              <div id="packetTrace" class="truncate text-zinc-500">
+                {"type":"MESSAGE","senderId":"BEE-8821","chunks":1,"payloadSize":"48B"}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== APP SCREENSHOTS SHOWCASE ==================== -->
+  <section id="screenshots" class="py-24 border-t border-[#1C1D24] relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-white">
+          Engineered for simplicity & speed.
+        </h2>
+        <p class="mt-4 text-brand-subtleText text-lg">
+          No complicated mesh settings. Bumblebee automatically pairs devices, handles packet chunking, and maintains local chat history.
+        </p>
+      </div>
+
+      <!-- 4 Screen Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Screen 1: Chats Screen -->
+        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-brand-lavender/50 transition-all group">
+          <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
+            <img src="screenshots/chats_screen.png" alt="Chats Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          </div>
+          <div class="mt-4 px-2">
+            <h3 class="font-bold text-base text-white flex items-center gap-2">
+              <i data-lucide="message-square" class="w-4 h-4 text-brand-honey"></i>
+              Honeycomb Chats
+            </h3>
+            <p class="text-xs text-brand-subtleText mt-1">
+              Active peer list with online radar indicators and unread count badges.
+            </p>
+          </div>
+        </div>
+
+        <!-- Screen 2: Direct Chat -->
+        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-brand-lavender/50 transition-all group">
+          <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
+            <img src="screenshots/chat_screen.png" alt="Direct Chat Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          </div>
+          <div class="mt-4 px-2">
+            <h3 class="font-bold text-base text-white flex items-center gap-2">
+              <i data-lucide="mic" class="w-4 h-4 text-brand-lavender"></i>
+              PTT Voice & HD Photos
+            </h3>
+            <p class="text-xs text-brand-subtleText mt-1">
+              Walkie-talkie voice notes, 1280px photo chunking, and delivery checks.
+            </p>
+          </div>
+        </div>
+
+        <!-- Screen 3: Emergency SOS -->
+        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-rose-500/50 transition-all group">
+          <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
+            <img src="screenshots/buzz_sos_screen.png" alt="Emergency SOS Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          </div>
+          <div class="mt-4 px-2">
+            <h3 class="font-bold text-base text-white flex items-center gap-2">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500"></i>
+              Distress SOS Beacon
+            </h3>
+            <p class="text-xs text-brand-subtleText mt-1">
+              Broadcasts emergency alerts with live GPS coordinates link and battery telemetry.
+            </p>
+          </div>
+        </div>
+
+        <!-- Screen 4: Settings -->
+        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-brand-lavender/50 transition-all group">
+          <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
+            <img src="screenshots/settings_screen.png" alt="Settings Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          </div>
+          <div class="mt-4 px-2">
+            <h3 class="font-bold text-base text-white flex items-center gap-2">
+              <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i>
+              Air-Gapped Privacy
+            </h3>
+            <p class="text-xs text-brand-subtleText mt-1">
+              Customizable avatars, cryptographic keys, and 100% offline verification.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== BENTO FEATURES ==================== -->
+  <section id="features" class="py-24 border-t border-[#1C1D24] bg-[#08090D]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-white">
+          Built for extreme environments.
+        </h2>
+        <p class="mt-4 text-brand-subtleText text-lg">
+          Whether you're in a hurricane blackout, hiking off-trail, or in an underground subway, Bumblebee keeps you connected.
+        </p>
+      </div>
+
+      <!-- Bento Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Feature 1 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-honey/40 transition-colors">
+          <div class="w-12 h-12 rounded-2xl bg-brand-honey/10 border border-brand-honey/20 flex items-center justify-center text-brand-honey mb-6">
+            <i data-lucide="wifi-off" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white">Zero-Internet Radio P2P</h3>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
+            Uses Bluetooth Low Energy (BLE) for zero-battery background discovery and upgrades automatically to high-bandwidth Wi-Fi Direct for rapid data throughput.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-lavender/40 transition-colors">
+          <div class="w-12 h-12 rounded-2xl bg-brand-lavender/10 border border-brand-lavender/20 flex items-center justify-center text-brand-lavender mb-6">
+            <i data-lucide="mic" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white">Push-To-Talk Walkie-Talkie</h3>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
+            Send crisp 22.05kHz AAC offline voice notes with interactive waveform equalizers. Perfect for quick hands-free communication during emergency operations.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-honey/40 transition-colors">
+          <div class="w-12 h-12 rounded-2xl bg-brand-honey/10 border border-brand-honey/20 flex items-center justify-center text-brand-honey mb-6">
+            <i data-lucide="image" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white">1280px HD Nectar Engine</h3>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
+            Overcomes Google Nearby's 32KB payload boundary by chunking high-definition images into 18KB sequenced slices and seamlessly reassembling them on the recipient's phone.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-emerald-400/40 transition-colors">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6">
+            <i data-lucide="key" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white">4-Digit Mutual Auth</h3>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
+            Prevents eavesdropping and rogue connections with a visual 4-digit code matching verification before the radio session is granted.
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-rose-500/40 transition-colors">
+          <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 mb-6">
+            <i data-lucide="alert-octagon" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white">GPS & Battery SOS Beacon</h3>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
+            Distress beacons query local GPS satellites and hardware battery state, broadcasting a Google Maps coordinate link and battery telemetry across the mesh.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-lavender/40 transition-colors">
+          <div class="w-12 h-12 rounded-2xl bg-brand-lavender/10 border border-brand-lavender/20 flex items-center justify-center text-brand-lavender mb-6">
+            <i data-lucide="lock" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white">100% Air-Gapped Privacy</h3>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
+            Zero telemetry, zero user accounts, zero analytics trackers, and zero cloud databases. Your conversations never touch the internet.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ARCHITECTURE SEQUENCE ==================== -->
+  <section id="architecture" class="py-24 border-t border-[#1C1D24] relative">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+          Under the Hood: 3-Phase P2P Radio
+        </h2>
+        <p class="mt-3 text-brand-subtleText text-base">
+          How Bumblebee establishes direct high-bandwidth links without routers or cellular infrastructure.
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        
+        <!-- Step 1 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg shrink-0">
+            01
+          </div>
+          <div class="flex-1">
+            <h4 class="text-base font-bold text-white flex items-center gap-2">
+              <span>Phase 1: BLE Autonomous Discovery</span>
+              <span class="text-xs font-mono text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">2.4 GHz Ultra Low Power</span>
+            </h4>
+            <p class="text-sm text-brand-subtleText mt-1">
+              Devices advertise a lightweight service UUID while scanning for neighboring phones. Radios consume minimal battery until a peer is spotted.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+          <div class="w-12 h-12 rounded-xl bg-brand-honey/10 border border-brand-honey/20 text-brand-honey flex items-center justify-center font-bold text-lg shrink-0">
+            02
+          </div>
+          <div class="flex-1">
+            <h4 class="text-base font-bold text-white flex items-center gap-2">
+              <span>Phase 2: Mutual 4-Digit PIN Handshake</span>
+              <span class="text-xs font-mono text-brand-honey bg-brand-honey/10 px-2 py-0.5 rounded border border-brand-honey/20">Curve25519 ECDH</span>
+            </h4>
+            <p class="text-sm text-brand-subtleText mt-1">
+              Both users review identical 4-digit verification digits on their screens to ensure no man-in-the-middle or spoofing before accepting.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg shrink-0">
+            03
+          </div>
+          <div class="flex-1">
+            <h4 class="text-base font-bold text-white flex items-center gap-2">
+              <span>Phase 3: High-Speed Wi-Fi Direct Nectar Tunnel</span>
+              <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Up to 250 Mbps Local Radio</span>
+            </h4>
+            <p class="text-sm text-brand-subtleText mt-1">
+              Radio negotiates a direct ad-hoc Wi-Fi tunnel. Voice memos, HD photos, and delivery receipts stream directly between radios with sub-second latency.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SETUP GUIDE ==================== -->
+  <section id="setup" class="py-24 border-t border-[#1C1D24] bg-[#08090D]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+          Get Started in 60 Seconds
+        </h2>
+        <p class="mt-3 text-brand-subtleText text-base">
+          No signups, no phone numbers, no email verification. Just download and run.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-brand-honey/10 border border-brand-honey/20 text-brand-honey flex items-center justify-center font-bold text-sm mb-4">
+            1
+          </div>
+          <h4 class="font-bold text-white text-base">Download APK</h4>
+          <p class="text-xs text-brand-subtleText mt-2 leading-relaxed">
+            Download the official <code class="text-zinc-200">bumblebee.apk</code> on two Android phones (Android 8.0+).
+          </p>
+        </div>
+
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-brand-lavender/10 border border-brand-lavender/20 text-brand-lavender flex items-center justify-center font-bold text-sm mb-4">
+            2
+          </div>
+          <h4 class="font-bold text-white text-base">Grant Permissions</h4>
+          <p class="text-xs text-brand-subtleText mt-2 leading-relaxed">
+            Allow Bluetooth, Location (required by Android for BLE), Nearby Devices, and Microphone.
+          </p>
+        </div>
+
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm mb-4">
+            3
+          </div>
+          <h4 class="font-bold text-white text-base">Turn Off Data</h4>
+          <p class="text-xs text-brand-subtleText mt-2 leading-relaxed">
+            Turn off cellular data and disconnect Wi-Fi to verify the 100% offline air-gap connection.
+          </p>
+        </div>
+
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm mb-4">
+            4
+          </div>
+          <h4 class="font-bold text-white text-base">Scan & Chat</h4>
+          <p class="text-xs text-brand-subtleText mt-2 leading-relaxed">
+            Tap Scan in Honeycomb tab, confirm the 4-digit code, and exchange messages instantly!
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Centered Download CTA -->
+      <div class="mt-12 text-center">
+        <a href="https://github.com/saisaran-m/bumblebee/releases/download/v1.0.0/bumblebee.apk"
+           class="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-brand-honey text-black font-extrabold text-base hover:bg-brand-honeyDark active:scale-95 transition-all glow-honey">
+          <i data-lucide="download" class="w-5 h-5 stroke-[2.5]"></i>
+          <span>Download bumblebee.apk (v1.0.0)</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== FAQ ACCORDION ==================== -->
+  <section id="faq" class="py-24 border-t border-[#1C1D24] relative">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+          Frequently Asked Questions
+        </h2>
+        <p class="mt-3 text-brand-subtleText text-base">
+          Everything you need to know about off-grid mesh communication.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        
+        <!-- Q1 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+          <h4 class="text-base font-bold text-white">Does Bumblebee really work with zero internet?</h4>
+          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+            Yes, 100%. Bumblebee communicates purely through physical radio waves (Bluetooth Low Energy and Wi-Fi Direct). No cell towers, SIM cards, Wi-Fi routers, or internet service providers are ever used.
+          </p>
+        </div>
+
+        <!-- Q2 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+          <h4 class="text-base font-bold text-white">What is the communication range?</h4>
+          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+            Direct peer-to-peer range typically spans 30 to 100+ meters in open air or clear line-of-sight. In multi-hop mesh mode, packets hop across intermediate devices up to 7 hops away.
+          </p>
+        </div>
+
+        <!-- Q3 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+          <h4 class="text-base font-bold text-white">Why does it need Location permission on Android?</h4>
+          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+            Google Android's security architecture mandates Location permission for apps performing Bluetooth scanning and Wi-Fi Direct discovery. Bumblebee uses this solely for radio device discovery and never uploads your location to any server.
+          </p>
+        </div>
+
+        <!-- Q4 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+          <h4 class="text-base font-bold text-white">How does Bumblebee send high-resolution photos offline?</h4>
+          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+            Standard Google Nearby Connections has a 32 KB limit on single payloads. Bumblebee's proprietary Nectar engine slices 1280px photos into 18KB chunk packets and reassembles them smoothly on the receiving device with zero visual degradation.
+          </p>
+        </div>
+
+        <!-- Q5 -->
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+          <h4 class="text-base font-bold text-white">Is it open-source?</h4>
+          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+            Yes! Bumblebee is completely open-source under the permissive MIT License. You can review the code, build from scratch, or contribute on GitHub.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CALL TO ACTION BANNER ==================== -->
+  <section class="py-20 border-t border-[#1C1D24] bg-gradient-to-b from-[#0B0D14] to-[#070809] text-center relative overflow-hidden">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      <div class="w-16 h-16 rounded-2xl bg-brand-honey/10 border border-brand-honey/30 mx-auto flex items-center justify-center text-3xl mb-6 glow-honey">
+        🐝
+      </div>
+
+      <h2 class="text-4xl sm:text-5xl font-black text-white tracking-tight">
+        Ready to communicate off the grid?
+      </h2>
+      <p class="mt-4 text-base sm:text-lg text-brand-subtleText max-w-xl mx-auto">
+        Download Bumblebee v1.0.0 today or clone the open-source repository on GitHub.
+      </p>
+
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <a href="https://github.com/saisaran-m/bumblebee/releases/download/v1.0.0/bumblebee.apk"
+           class="flex items-center gap-3 px-8 py-4 rounded-xl bg-brand-honey text-black font-extrabold text-base hover:bg-brand-honeyDark active:scale-95 transition-all glow-honey">
+          <i data-lucide="download" class="w-5 h-5 stroke-[2.5]"></i>
+          <span>Download bumblebee.apk</span>
+        </a>
+
+        <a href="https://github.com/saisaran-m/bumblebee" target="_blank" rel="noopener noreferrer"
+           class="flex items-center gap-2 px-7 py-4 rounded-xl bg-[#141620] border border-[#272A38] text-white font-semibold text-base hover:border-zinc-400 active:scale-95 transition-all">
+          <i data-lucide="github" class="w-5 h-5"></i>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-[#171820] py-12 bg-[#050608]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-[#14151B] border border-[#262833] flex items-center justify-center text-base">
+          🐝
+        </div>
+        <span class="font-bold text-white text-base">Bumblebee</span>
+        <span class="text-xs text-brand-subtleText">• 100% Offline P2P Mesh Communication</span>
+      </div>
+
+      <div class="flex items-center gap-6 text-sm text-brand-subtleText">
+        <a href="https://github.com/saisaran-m/bumblebee" class="hover:text-white transition-colors">GitHub</a>
+        <a href="https://github.com/saisaran-m/bumblebee/releases" class="hover:text-white transition-colors">Releases</a>
+        <a href="https://github.com/saisaran-m/bumblebee/blob/main/LICENSE" class="hover:text-white transition-colors">MIT License</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ==================== INTERACTIVE SIMULATOR SCRIPT ==================== -->
+  <script>
+    lucide.createIcons();
+
+    let isAirplaneOn = true;
+
+    function toggleAirplaneMode() {
+      isAirplaneOn = !isAirplaneOn;
+      const btn = document.getElementById('toggleAirplane');
+      if (isAirplaneOn) {
+        btn.textContent = 'Airplane Mode: ON (Air-Gapped)';
+        btn.className = 'px-3 py-1 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all';
+      } else {
+        btn.textContent = 'Airplane Mode: OFF (Online)';
+        btn.className = 'px-3 py-1 rounded-md text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all';
+      }
+    }
+
+    function sendSimMessage() {
+      const input = document.getElementById('simInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      const phoneA = document.getElementById('phoneAMessages');
+      const phoneB = document.getElementById('phoneBMessages');
+
+      // Append to A
+      const msgDivA = document.createElement('div');
+      msgDivA.className = 'flex justify-end';
+      msgDivA.innerHTML = `
+        <div class="bg-brand-lavenderDark/40 text-purple-100 rounded-xl px-3 py-2 max-w-[80%] border border-brand-lavender/30">
+          ${escapeHtml(text)}
+        </div>
+      `;
+      phoneA.appendChild(msgDivA);
+      phoneA.scrollTop = phoneA.scrollHeight;
+
+      // Update Radio Packet Trace
+      const packetTrace = document.getElementById('packetTrace');
+      const packetStatus = document.getElementById('packetStatus');
+      const byteSize = new Blob([text]).size;
+      packetTrace.textContent = JSON.stringify({
+        type: "MESSAGE",
+        senderId: "BEE-8821",
+        payloadBytes: byteSize + "B",
+        carrier: "Wi-Fi Direct P2P",
+        hop: 0,
+        content: text
+      });
+      packetStatus.textContent = "TRANSMITTING RADIO PACKET...";
+      packetStatus.className = "text-amber-400";
+
+      // Receive on B after 150ms simulated radio flight
+      setTimeout(() => {
+        const msgDivB = document.createElement('div');
+        msgDivB.className = 'flex justify-start';
+        msgDivB.innerHTML = `
+          <div class="bg-[#1C1E29] text-zinc-200 rounded-xl px-3 py-2 max-w-[80%] border border-[#282B3B]">
+            ${escapeHtml(text)}
+          </div>
+        `;
+        phoneB.appendChild(msgDivB);
+        phoneB.scrollTop = phoneB.scrollHeight;
+
+        packetStatus.textContent = "ACK_DELIVERED (0.1ms radio latency)";
+        packetStatus.className = "text-emerald-400";
+      }, 160);
+    }
+
+    function sendSimVoice() {
+      const phoneA = document.getElementById('phoneAMessages');
+      const phoneB = document.getElementById('phoneBMessages');
+
+      const voiceDivA = document.createElement('div');
+      voiceDivA.className = 'flex justify-end';
+      voiceDivA.innerHTML = `
+        <div class="bg-brand-lavenderDark/40 text-purple-100 rounded-xl px-3 py-2 border border-brand-lavender/30 flex items-center gap-2">
+          <span>🎙️</span>
+          <span class="font-mono text-[11px]">Voice Memo (0:03)</span>
+        </div>
+      `;
+      phoneA.appendChild(voiceDivA);
+      phoneA.scrollTop = phoneA.scrollHeight;
+
+      const packetTrace = document.getElementById('packetTrace');
+      const packetStatus = document.getElementById('packetStatus');
+      packetTrace.textContent = JSON.stringify({
+        type: "VOICE",
+        codec: "AAC-LC",
+        bitrate: "32kbps",
+        chunks: 1,
+        duration: "3000ms"
+      });
+      packetStatus.textContent = "TRANSMITTING AUDIO CHUNK...";
+      packetStatus.className = "text-amber-400";
+
+      setTimeout(() => {
+        const voiceDivB = document.createElement('div');
+        voiceDivB.className = 'flex justify-start';
+        voiceDivB.innerHTML = `
+          <div class="bg-[#1C1E29] text-zinc-200 rounded-xl px-3 py-2 border border-[#282B3B] flex items-center gap-2">
+            <span>🎙️</span>
+            <span class="font-mono text-[11px]">Voice Memo (0:03)</span>
+          </div>
+        `;
+        phoneB.appendChild(voiceDivB);
+        phoneB.scrollTop = phoneB.scrollHeight;
+        packetStatus.textContent = "ACK_DELIVERED (0.1ms radio latency)";
+        packetStatus.className = "text-emerald-400";
+      }, 200);
+    }
+
+    function escapeHtml(string) {
+      return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
