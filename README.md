@@ -1,7 +1,7 @@
 # Bumblebee
 
 [![Latest Release](https://img.shields.io/github/v/release/saisaran-m/bumblebee?color=9B7EDE&label=Latest%20Release)](https://github.com/saisaran-m/bumblebee/releases/latest)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(v1.0.0)-F5C542?logo=android&logoColor=white)](https://github.com/saisaran-m/bumblebee/releases/latest/download/bumblebee.apk)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(v1.0.0)-F5C542?logo=android&logoColor=white)](https://github.com/saisaran-m/bumblebee/releases/download/v1.0.0/bumblebee.apk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7C5CBF.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
 [![Offline](https://img.shields.io/badge/Network-100%25%20Offline%20P2P-black)](#key-features)
@@ -63,6 +63,16 @@ Bumblebee is built following modern Android engineering standards and Clean Arch
 1. **Discovery Phase**: Bluetooth Low Energy (BLE) continuously advertises and scans for nearby devices within physical range.
 2. **Handshake Phase**: Upon connection request, a 4-digit authentication code is verified on both screens to establish a trusted session.
 3. **Transmission Phase**: Radio upgrades to Wi-Fi Direct for fast, high-bandwidth communication without going through an external router or access point.
+
+---
+
+## Download & Installation
+
+The pre-compiled, signed Android APK is available directly from the GitHub Releases page:
+
+- **Direct Download**: **[Download bumblebee.apk (v1.0.0)](https://github.com/saisaran-m/bumblebee/releases/download/v1.0.0/bumblebee.apk)**
+- **Releases Page**: [View All Releases & Changelogs](https://github.com/saisaran-m/bumblebee/releases)
+- **Compatibility**: Android 8.0 (API level 26) or higher
 
 ---
 
