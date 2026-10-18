@@ -47,16 +47,25 @@ class BuzzViewModel @Inject constructor(
         triggerHapticAlert()
         _sosState.value = _sosState.value.copy(isBroadcasting = true, isSafe = false)
 
+        val bm = context.getSystemService(Context.BATTERY_SERVICE) as? android.os.BatteryManager
+        val batteryPct = bm?.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: -1
+        val batterySuffix = if (batteryPct in 0..100) " [Battery: $batteryPct%]" else ""
+
         try {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 val lat = location?.latitude
                 val lon = location?.longitude
-                broadcastSosPacket(lat, lon, "EMERGENCY SOS: I need help! My phone is broadcasting this distress signal offline.")
+                val locText = if (lat != null && lon != null) {
+                    "GPS: https://maps.google.com/?q=$lat,$lon"
+                } else {
+                    "GPS: Offline Signal"
+                }
+                broadcastSosPacket(lat, lon, "🚨 EMERGENCY SOS: I need help! $locText$batterySuffix")
             }.addOnFailureListener {
-                broadcastSosPacket(null, null, "EMERGENCY SOS: I need help! (GPS coordinates unavailable)")
+                broadcastSosPacket(null, null, "🚨 EMERGENCY SOS: I need help! (GPS unavailable)$batterySuffix")
             }
         } catch (e: Exception) {
-            broadcastSosPacket(null, null, "EMERGENCY SOS: I need help!")
+            broadcastSosPacket(null, null, "🚨 EMERGENCY SOS: I need help!$batterySuffix")
         }
     }
 

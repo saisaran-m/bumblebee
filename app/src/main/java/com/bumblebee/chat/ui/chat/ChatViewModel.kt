@@ -97,4 +97,13 @@ class ChatViewModel @Inject constructor(
             chatRepository.sendImage(convId, peerId, imageBytes)
         }
     }
+
+    fun sendVoiceNote(audioBytes: ByteArray, durationMs: Long) {
+        val convId = _uiState.value.conversationId
+        val peerId = _uiState.value.peer?.peerId ?: peerIdArg
+        if (convId.isBlank()) return
+        viewModelScope.launch {
+            chatRepository.sendVoiceNote(convId, peerId, audioBytes, durationMs)
+        }
+    }
 }

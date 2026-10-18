@@ -17,10 +17,12 @@ Designed for off-grid scenarios such as natural disasters, remote hiking, flight
 ## Key Features
 
 - **Zero-Internet Communication**: Connects directly device-to-device using Bluetooth Low Energy (BLE) for discovery and Wi-Fi Direct for high-bandwidth data transfer.
-- **Direct Messaging**: One-on-one instant messaging with delivery state tracking (`Sending`, `Sent`, `Delivered`, `Read`).
-- **Offline Photo Sharing**: In-chat camera and gallery photo sharing, optimized for fast radio payload transmission with full-screen preview.
+- **Push-To-Talk Voice Walkie-Talkie**: Record and transmit crisp offline voice memos with animated waveform visualization and playback controls.
+- **High-Definition Photo Sharing**: Proprietary Nectar chunking engine streams crystal-clear 1280px HD images across radio packets with zero compression artifacts.
+- **Direct Messaging**: One-on-one instant messaging with real-time delivery state tracking (`Sending`, `Sent`, `Delivered`, `Read`).
+- **Live Radio Telemetry**: Tap connection status to inspect carrier protocol, mesh hop distance, packet throughput, and air-gap security metrics in real time.
 - **Honeycomb Discovery Radar**: Real-time visual discovery of nearby devices with 4-digit mutual authentication codes for secure pairing.
-- **Emergency SOS Buzz**: Offline emergency distress beacon that broadcasts urgent alerts with coordinates to all peers in range.
+- **Enhanced Emergency SOS Buzz**: Offline distress beacon that broadcasts urgent alerts with Google Maps GPS coordinates link and device battery level telemetry to all peers in range.
 - **Privacy by Design**: No cloud servers, no account registration, no telemetry, and no centralized data collection. All chat history and media remain encrypted and stored strictly on the local device.
 
 ---

@@ -42,6 +42,7 @@ class ChatRepository @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
+    private val incomingChunks = java.util.concurrent.ConcurrentHashMap<String, Array<String?>>()
 
     val discoveredPeers: StateFlow<List<DiscoveredPeer>> = nearbyManager.discoveredPeers
     val connectedPeers: StateFlow<List<ConnectedPeer>> = nearbyManager.connectedPeers
@@ -264,10 +265,41 @@ class ChatRepository @Inject constructor(
         }
     }
 
+    private fun saveReceivedVoice(messageId: String, base64Data: String): String? {
+        return try {
+            val dir = File(context.cacheDir, "bumblebee_nectar")
+            if (!dir.exists()) dir.mkdirs()
+            val file = File(dir, "voice_${messageId}.m4a")
+            val bytes = Base64.decode(base64Data, Base64.DEFAULT)
+            FileOutputStream(file).use { it.write(bytes) }
+            file.absolutePath
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     private suspend fun handleIncomingMessage(endpointId: String, packet: NearbyPacket) {
         val peerId = packet.senderId.ifBlank { endpointId }
 
-        // 1. Ensure peer exists in DB
+        // 1. Handle multi-chunk media reassembly if needed
+        val msgId = packet.messageId ?: UUID.randomUUID().toString()
+        val completeBase64: String?
+        if (packet.totalChunks > 1) {
+            val chunks = incomingChunks.computeIfAbsent(msgId) { arrayOfNulls(packet.totalChunks) }
+            if (packet.chunkIndex in chunks.indices) {
+                chunks[packet.chunkIndex] = packet.mediaBase64 ?: ""
+            }
+            if (chunks.any { it == null }) {
+                // Wait for all chunks before persisting message
+                return
+            }
+            completeBase64 = chunks.joinToString("")
+            incomingChunks.remove(msgId)
+        } else {
+            completeBase64 = packet.mediaBase64
+        }
+
+        // 2. Ensure peer exists in DB
         val existingPeer = peerDao.getPeerById(peerId) ?: peerDao.getPeerByEndpointId(endpointId)
         val peer = (existingPeer ?: PeerEntity(
             peerId = peerId,
@@ -286,42 +318,63 @@ class ChatRepository @Inject constructor(
         )
         peerDao.insertOrUpdate(peer)
 
-        // 2. Ensure conversation exists
+        // 3. Ensure conversation exists
         val conv = getOrCreateConversation(peerId, packet.senderName)
         val convId = conv.conversationId
 
-        // 3. Process media if attached
+        // 4. Process media if attached
         var localMediaUri: String? = null
-        if (!packet.mediaBase64.isNullOrEmpty()) {
-            localMediaUri = saveReceivedImage(packet.messageId ?: UUID.randomUUID().toString(), packet.mediaBase64)
+        val isVoice = packet.mediaType == "VOICE"
+        val isPhoto = packet.mediaType == "IMAGE" || (!isVoice && !completeBase64.isNullOrEmpty())
+
+        if (!completeBase64.isNullOrEmpty()) {
+            localMediaUri = if (isVoice) {
+                saveReceivedVoice(msgId, completeBase64)
+            } else {
+                saveReceivedImage(msgId, completeBase64)
+            }
         }
 
-        // 4. Insert message
-        val msgId = packet.messageId ?: UUID.randomUUID().toString()
-        val isPhoto = localMediaUri != null || packet.mediaType == "IMAGE"
+        val msgType = when {
+            isVoice -> "VOICE"
+            isPhoto -> "IMAGE"
+            else -> "TEXT"
+        }
+        val displayContent = packet.content ?: when {
+            isVoice -> "🎙️ Voice memo"
+            isPhoto -> "Photo"
+            else -> ""
+        }
+        val lastMsgPreview = when {
+            isVoice -> "🎙️ Voice memo"
+            isPhoto -> "📷 Photo"
+            else -> packet.content ?: ""
+        }
+
+        // 5. Insert message
         val message = MessageEntity(
             messageId = msgId,
             conversationId = convId,
             senderId = peerId,
-            content = packet.content ?: if (isPhoto) "Photo" else "",
+            content = displayContent,
             timestamp = packet.timestamp,
-            type = if (isPhoto) "IMAGE" else "TEXT",
+            type = msgType,
             status = "DELIVERED",
             isOutgoing = false,
             mediaUri = localMediaUri
         )
         messageDao.insertOrUpdate(message)
 
-        // 5. Update conversation last message & unread count
+        // 6. Update conversation last message & unread count
         conversationDao.insertOrUpdate(
             conv.copy(
-                lastMessage = if (isPhoto) "📷 Photo" else packet.content,
+                lastMessage = lastMsgPreview,
                 lastMessageTimestamp = packet.timestamp,
                 unreadCount = conv.unreadCount + 1
             )
         )
 
-        // 6. Send ACK_DELIVERED back to sender
+        // 7. Send ACK_DELIVERED back to sender
         val localName = userPreferencesRepository.displayName.first()
         val localUserId = userPreferencesRepository.userId.first()
         val ack = NearbyPacket(
@@ -559,7 +612,8 @@ class ChatRepository @Inject constructor(
             type = "IMAGE",
             status = if (endpointId != null) "SENDING" else "FAILED",
             isOutgoing = true,
-            mediaUri = localPath
+            mediaUri = localPath,
+            mediaSizeBytes = imageBytes.size.toLong()
         )
         messageDao.insertOrUpdate(message)
 
@@ -574,22 +628,115 @@ class ChatRepository @Inject constructor(
             )
         }
 
-        // 4. Send over Nearby
+        // 4. Send over Nearby using reliable chunking (18KB per packet, safely below Nearby limit)
         if (endpointId != null) {
-            val packet = NearbyPacket(
-                type = NearbyPacket.PacketType.MESSAGE,
-                senderId = localUserId,
-                senderName = localName,
-                senderEmoji = localEmoji,
-                senderColor = localColor,
-                messageId = messageId,
-                conversationId = conversationId,
-                content = "Photo",
-                timestamp = now,
-                mediaType = "IMAGE",
-                mediaBase64 = base64
+            val chunkSize = 18_000
+            val totalChunks = (base64.length + chunkSize - 1) / chunkSize
+            for (i in 0 until totalChunks) {
+                val start = i * chunkSize
+                val end = minOf(start + chunkSize, base64.length)
+                val chunk = base64.substring(start, end)
+                val packet = NearbyPacket(
+                    type = NearbyPacket.PacketType.MESSAGE,
+                    senderId = localUserId,
+                    senderName = localName,
+                    senderEmoji = localEmoji,
+                    senderColor = localColor,
+                    messageId = messageId,
+                    conversationId = conversationId,
+                    content = "Photo",
+                    timestamp = now,
+                    mediaType = "IMAGE",
+                    mediaBase64 = chunk,
+                    chunkIndex = i,
+                    totalChunks = totalChunks
+                )
+                nearbyManager.sendPacket(endpointId, packet)
+            }
+            messageDao.updateStatus(messageId, "SENT")
+            return true
+        }
+        return false
+    }
+
+    suspend fun sendVoiceNote(conversationId: String, peerIdArg: String, audioBytes: ByteArray, durationMs: Long): Boolean {
+        val messageId = UUID.randomUUID().toString()
+        val now = System.currentTimeMillis()
+
+        // 1. Save local copy to cache
+        val dir = File(context.cacheDir, "bumblebee_nectar")
+        if (!dir.exists()) dir.mkdirs()
+        val file = File(dir, "voice_${messageId}.m4a")
+        FileOutputStream(file).use { it.write(audioBytes) }
+        val localPath = file.absolutePath
+
+        val base64 = Base64.encodeToString(audioBytes, Base64.NO_WRAP)
+
+        val localUserId = userPreferencesRepository.userId.first()
+        val localName = userPreferencesRepository.displayName.first()
+        val localEmoji = userPreferencesRepository.avatarEmoji.first()
+        val localColor = userPreferencesRepository.avatarColor.first()
+
+        val peer = peerDao.getPeerById(peerIdArg) ?: peerDao.getPeerByEndpointId(peerIdArg)
+        val canonicalPeerId = peer?.peerId ?: peerIdArg
+        val endpointId = peer?.endpointId ?: nearbyManager.connectedPeers.value.find {
+            it.userId == canonicalPeerId || it.endpointId == peerIdArg || it.userId == peerIdArg
+        }?.endpointId
+
+        val durationSec = (durationMs / 1000).coerceAtLeast(1)
+
+        // 2. Save Message in Room
+        val message = MessageEntity(
+            messageId = messageId,
+            conversationId = conversationId,
+            senderId = localUserId,
+            content = "Voice memo ($durationSec s)",
+            timestamp = now,
+            type = "VOICE",
+            status = if (endpointId != null) "SENDING" else "FAILED",
+            isOutgoing = true,
+            mediaUri = localPath,
+            mediaSizeBytes = audioBytes.size.toLong()
+        )
+        messageDao.insertOrUpdate(message)
+
+        // 3. Update conversation
+        val conv = conversationDao.getConversationById(conversationId)
+        if (conv != null) {
+            conversationDao.insertOrUpdate(
+                conv.copy(
+                    lastMessage = "🎙️ Voice memo (${durationSec}s)",
+                    lastMessageTimestamp = now
+                )
             )
-            nearbyManager.sendPacket(endpointId, packet)
+        }
+
+        // 4. Send over Nearby with chunking
+        if (endpointId != null) {
+            val chunkSize = 18_000
+            val totalChunks = (base64.length + chunkSize - 1) / chunkSize
+            for (i in 0 until totalChunks) {
+                val start = i * chunkSize
+                val end = minOf(start + chunkSize, base64.length)
+                val chunk = base64.substring(start, end)
+                val packet = NearbyPacket(
+                    type = NearbyPacket.PacketType.MESSAGE,
+                    senderId = localUserId,
+                    senderName = localName,
+                    senderEmoji = localEmoji,
+                    senderColor = localColor,
+                    messageId = messageId,
+                    conversationId = conversationId,
+                    content = "Voice memo ($durationSec s)",
+                    timestamp = now,
+                    mediaType = "VOICE",
+                    mediaBase64 = chunk,
+                    chunkIndex = i,
+                    totalChunks = totalChunks,
+                    mediaDurationMs = durationMs
+                )
+                nearbyManager.sendPacket(endpointId, packet)
+            }
             messageDao.updateStatus(messageId, "SENT")
             return true
         }

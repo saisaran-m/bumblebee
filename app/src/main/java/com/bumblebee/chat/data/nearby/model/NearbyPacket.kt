@@ -28,7 +28,10 @@ data class NearbyPacket(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val mediaType: String? = null,
-    val mediaBase64: String? = null
+    val mediaBase64: String? = null,
+    val chunkIndex: Int = 0,
+    val totalChunks: Int = 1,
+    val mediaDurationMs: Long = 0
 ) {
     enum class PacketType {
         HANDSHAKE,
@@ -64,6 +67,9 @@ data class NearbyPacket(
             if (longitude != null) put("longitude", longitude)
             if (mediaType != null) put("mediaType", mediaType)
             if (mediaBase64 != null) put("mediaBase64", mediaBase64)
+            put("chunkIndex", chunkIndex)
+            put("totalChunks", totalChunks)
+            put("mediaDurationMs", mediaDurationMs)
         }
         return json.toString().toByteArray(Charsets.UTF_8)
     }
@@ -94,7 +100,10 @@ data class NearbyPacket(
                     latitude = if (json.has("latitude")) json.optDouble("latitude") else null,
                     longitude = if (json.has("longitude")) json.optDouble("longitude") else null,
                     mediaType = json.optString("mediaType").takeIf { it.isNotEmpty() },
-                    mediaBase64 = json.optString("mediaBase64").takeIf { it.isNotEmpty() }
+                    mediaBase64 = json.optString("mediaBase64").takeIf { it.isNotEmpty() },
+                    chunkIndex = json.optInt("chunkIndex", 0),
+                    totalChunks = json.optInt("totalChunks", 1),
+                    mediaDurationMs = json.optLong("mediaDurationMs", 0L)
                 )
             } catch (e: Exception) {
                 null
