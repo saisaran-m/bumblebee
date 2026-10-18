@@ -280,9 +280,30 @@ class ChatRepository @Inject constructor(
 
     private suspend fun handleIncomingMessage(endpointId: String, packet: NearbyPacket) {
         val peerId = packet.senderId.ifBlank { endpointId }
-
-        // 1. Handle multi-chunk media reassembly if needed
         val msgId = packet.messageId ?: UUID.randomUUID().toString()
+
+        // 0. Payload validation
+        if (peerId.isBlank()) return
+        if (packet.totalChunks < 1 || packet.totalChunks > 250) return
+        if (packet.chunkIndex < 0 || packet.chunkIndex >= packet.totalChunks) return
+
+        // 1. Message Deduplication: Prevent duplicate inserts if sender retries transmission
+        val existingMessage = messageDao.getMessageById(msgId)
+        if (existingMessage != null) {
+            // Already stored! Re-send ACK_DELIVERED in case peer retransmitted due to missed earlier ACK
+            val localName = userPreferencesRepository.displayName.first()
+            val localUserId = userPreferencesRepository.userId.first()
+            val ack = NearbyPacket(
+                type = NearbyPacket.PacketType.ACK_DELIVERED,
+                senderId = localUserId,
+                senderName = localName,
+                messageId = msgId
+            )
+            nearbyManager.sendPacket(endpointId, ack)
+            return
+        }
+
+        // 2. Handle multi-chunk media reassembly if needed
         val completeBase64: String?
         if (packet.totalChunks > 1) {
             val chunks = incomingChunks.computeIfAbsent(msgId) { arrayOfNulls(packet.totalChunks) }
@@ -570,7 +591,11 @@ class ChatRepository @Inject constructor(
                 content = trimmed,
                 timestamp = now
             )
-            nearbyManager.sendPacket(endpointId, packet)
+            nearbyManager.sendPacket(endpointId, packet) { _ ->
+                scope.launch {
+                    messageDao.updateStatus(messageId, "FAILED")
+                }
+            }
             messageDao.updateStatus(messageId, "SENT")
             return true
         }
@@ -651,7 +676,11 @@ class ChatRepository @Inject constructor(
                     chunkIndex = i,
                     totalChunks = totalChunks
                 )
-                nearbyManager.sendPacket(endpointId, packet)
+                nearbyManager.sendPacket(endpointId, packet) { _ ->
+                    scope.launch {
+                        messageDao.updateStatus(messageId, "FAILED")
+                    }
+                }
             }
             messageDao.updateStatus(messageId, "SENT")
             return true
@@ -735,7 +764,11 @@ class ChatRepository @Inject constructor(
                     totalChunks = totalChunks,
                     mediaDurationMs = durationMs
                 )
-                nearbyManager.sendPacket(endpointId, packet)
+                nearbyManager.sendPacket(endpointId, packet) { _ ->
+                    scope.launch {
+                        messageDao.updateStatus(messageId, "FAILED")
+                    }
+                }
             }
             messageDao.updateStatus(messageId, "SENT")
             return true

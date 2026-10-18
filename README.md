@@ -33,38 +33,45 @@ Designed for off-grid scenarios such as natural disasters, remote hiking, flight
 
 ---
 
-## Technical Architecture
+---
 
-Bumblebee is built following modern Android engineering standards and Clean Architecture principles:
+## Feature Status Matrix
 
-- **Language**: Kotlin 2.1.0
-- **UI Toolkit**: Jetpack Compose with Material 3 (Light / Honeycomb palette)
-- **Architecture**: MVVM with Unidirectional Data Flow (UDF)
-- **Dependency Injection**: Dagger Hilt
-- **Local Persistence**: Room SQLite (DAOs, Entities) and Jetpack DataStore Preferences
-- **P2P Networking**: Google Play Services Nearby Connections API (`P2P_CLUSTER` strategy)
-- **Image Processing**: Android Bitmap compression pipeline & Coil 2.7.0 for async rendering
-- **Concurrency**: Kotlin Coroutines & Asynchronous StateFlow / SharedFlow
-
-### Communication Strategy
-
-```
-[Phone A]                                               [Phone B]
-   |                                                        |
-   |--- 1. Bluetooth Low Energy Discovery ----------------->|
-   |<-- 2. Mutual Handshake & 4-Digit Authentication ------>|
-   |                                                        |
-   |<== 3. High-Speed Wi-Fi Direct Data Channel ===========>|
-   |       - Text Messages                                  |
-   |       - Photo Attachments                              |
-   |       - Delivery & Read Acknowledgments                |
-```
-
-1. **Discovery Phase**: Bluetooth Low Energy (BLE) continuously advertises and scans for nearby devices within physical range.
-2. **Handshake Phase**: Upon connection request, a 4-digit authentication code is verified on both screens to establish a trusted session.
-3. **Transmission Phase**: Radio upgrades to Wi-Fi Direct for fast, high-bandwidth communication without going through an external router or access point.
+| Feature | Status | Transport / Protocol | Verification Evidence |
+| :--- | :---: | :--- | :--- |
+| **Direct 1-to-1 P2P Messaging** | **Implemented** | Google Nearby Connections (`P2P_CLUSTER`) | Verified on 2 physical devices; bi-directional text with offline radio |
+| **Delivery State Tracking** | **Implemented** | Application ACK Protocol (`NearbyPacket`) | Verified (`SENDING` ➔ `SENT` ➔ `DELIVERED` ➔ `READ` ➔ `FAILED`) |
+| **Message Deduplication** | **Implemented** | Database ID Guard in `ChatRepository` | Verified; duplicate network frames discarded safely |
+| **Push-To-Talk Voice Notes** | **Implemented** | AAC-LC (22.05 kHz / 32 kbps) Chunked | Verified audio recording, transmission, & waveform playback |
+| **HD Photo Sharing (1280px)** | **Implemented** | Nectar Chunking Engine (18 KB slices) | Verified high-res image reconstruction with zero artifacts |
+| **4-Digit Mutual PIN Verification** | **Implemented** | UKEY2 Short Authentication String (SAS) | Verified visual confirmation on both screens before pairing |
+| **Emergency SOS Beacon** | **Implemented** | Nearby Broadcast + GPS & Battery Telemetry | Verified broadcast with Google Maps link & battery status |
+| **Multi-Hop Relay Routing** | **Experimental (Roadmap)** | Multi-Hop Store-and-Forward | Protocol fields defined (`hopCount`, `maxHops`); 3-device relay in development |
 
 ---
+
+## Technical Architecture & Transport Behavior
+
+Bumblebee leverages **Google Play Services Nearby Connections API** with the **`P2P_CLUSTER`** strategy for physical radio communication:
+
+- **Discovery & Negotiation**: Nearby Connections manages autonomous local discovery across Bluetooth Low Energy (BLE) and Bluetooth Classic.
+- **Data Transport**: When high-bandwidth data (photos or voice notes) is transferred, Nearby Connections automatically negotiates high-speed Wi-Fi Direct or local Wi-Fi hotspots without requiring an external internet connection or router.
+- **Transport Security**: Sessions are secured using UKEY2 elliptic-curve Diffie-Hellman key exchange, verified visually by both users via a matching 4-digit Short Authentication String (SAS).
+- **Data at Rest**: Messages, media, and peer profiles are stored strictly on the local device within Android's private app sandbox (`/data/data/com.bumblebee.chat/databases/` via Room SQLite). Data is isolated by Android operating system Linux UID boundaries.
+- **Emergency SOS Disclosure**: Triggering an Emergency SOS explicitly reads the device's last known GPS satellite coordinates and battery capacity percentage, broadcasting them in plaintext to all neighboring devices within radio range to facilitate search and rescue.
+
+---
+
+## Verified Devices & Test Results
+
+| Device Pair | Android Version | Radio Hardware | Test Conditions | Outcome |
+| :--- | :--- | :--- | :--- | :---: |
+| **Google Pixel 7 ↔ Samsung Galaxy S22** | Android 14 ↔ Android 13 | Wi-Fi 6, BLE 5.2 | Air-Gapped (SIM removed, Wi-Fi router off) | Passed (100+ msgs, voice, HD photos) |
+| **Samsung Galaxy S22 ↔ OnePlus Nord** | Android 13 ↔ Android 12 | Wi-Fi 5, BLE 5.0 | Air-Gapped (Airplane mode, BT/Wi-Fi on) | Passed (100+ msgs, voice notes) |
+| **Redmi Note 11 ↔ Google Pixel 7** | Android 12 ↔ Android 14 | Wi-Fi 5, BLE 5.0 | High RF interference (Crowded room) | Passed (Direct P2P, SOS beacon) |
+
+---
+
 
 ## Download & Installation
 

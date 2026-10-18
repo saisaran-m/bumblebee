@@ -255,10 +255,11 @@ class NearbyConnectionManager @Inject constructor(
         _incomingConnectionRequest.value = null
     }
 
-    fun sendPacket(endpointId: String, packet: NearbyPacket) {
+    fun sendPacket(endpointId: String, packet: NearbyPacket, onFailure: ((Exception) -> Unit)? = null) {
         val payload = Payload.fromBytes(packet.toByteArray())
         client.sendPayload(endpointId, payload).addOnFailureListener { e ->
             Log.e(tag, "Failed to send packet to $endpointId", e)
+            onFailure?.invoke(e)
         }
     }
 
