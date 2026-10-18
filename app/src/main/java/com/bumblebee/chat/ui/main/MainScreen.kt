@@ -44,7 +44,8 @@ enum class BottomNavItem(
 
 @Composable
 fun MainScreen(
-    onNavigateToChat: (peerId: String) -> Unit = {}
+    onNavigateToChat: (peerId: String) -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(BottomNavItem.Chats) }
 
@@ -93,7 +94,9 @@ fun MainScreen(
                     onNavigateToChat = onNavigateToChat
                 )
                 BottomNavItem.Buzz -> BuzzScreen()
-                BottomNavItem.Settings -> SettingsScreen()
+                BottomNavItem.Settings -> SettingsScreen(
+                    onLogout = onLogout
+                )
             }
         }
     }

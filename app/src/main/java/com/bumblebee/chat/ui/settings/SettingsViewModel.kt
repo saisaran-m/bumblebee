@@ -76,4 +76,11 @@ class SettingsViewModel @Inject constructor(
             onWipeComplete()
         }
     }
+
+    fun logout(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            chatRepository.resetAllDataAndLogout()
+            onComplete()
+        }
+    }
 }

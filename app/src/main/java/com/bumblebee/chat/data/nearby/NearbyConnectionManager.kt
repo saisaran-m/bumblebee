@@ -64,6 +64,11 @@ class NearbyConnectionManager @Inject constructor(
     private val _peerDisconnectedEvents = MutableSharedFlow<String>(extraBufferCapacity = 16)
     val peerDisconnectedEvents: SharedFlow<String> = _peerDisconnectedEvents.asSharedFlow()
 
+    private val _peerConnectedEvents = MutableSharedFlow<ConnectedPeer>(extraBufferCapacity = 16)
+    val peerConnectedEvents: SharedFlow<ConnectedPeer> = _peerConnectedEvents.asSharedFlow()
+
+    private val pendingConnectionInfo = java.util.concurrent.ConcurrentHashMap<String, Tuple4<String, String, Long, String>>()
+
     // Endpoint payload callback
     private val payloadCallback = object : PayloadCallback() {
         override fun onPayloadReceived(endpointId: String, payload: Payload) {
@@ -85,6 +90,7 @@ class NearbyConnectionManager @Inject constructor(
     private val connectionLifecycleCallback = object : ConnectionLifecycleCallback() {
         override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo) {
             val (name, emoji, color, userId) = parseEndpointInfo(connectionInfo.endpointName)
+            pendingConnectionInfo[endpointId] = Tuple4(name, emoji, color, userId)
             val digits = connectionInfo.authenticationDigits ?: "0000"
 
             _incomingConnectionRequest.value = ConnectionRequest(
@@ -103,23 +109,35 @@ class NearbyConnectionManager @Inject constructor(
             }
 
             if (resolution.status.statusCode == ConnectionsStatusCodes.STATUS_OK) {
+                val pending = pendingConnectionInfo[endpointId]
                 val discovered = _discoveredPeers.value.find { it.endpointId == endpointId }
+                val name = pending?.a ?: discovered?.displayName ?: "Nearby Bee"
+                val emoji = pending?.b ?: discovered?.avatarEmoji ?: "\uD83D\uDC1D"
+                val color = pending?.c ?: discovered?.avatarColor ?: 0xFF9B7EDE
+                val userId = pending?.d ?: discovered?.userId ?: ""
+
                 val connectedPeer = ConnectedPeer(
                     endpointId = endpointId,
-                    displayName = discovered?.displayName ?: "Nearby Bee",
-                    avatarEmoji = discovered?.avatarEmoji ?: "\uD83D\uDC1D",
-                    avatarColor = discovered?.avatarColor ?: 0xFF9B7EDE,
-                    userId = discovered?.userId ?: ""
+                    displayName = name,
+                    avatarEmoji = emoji,
+                    avatarColor = color,
+                    userId = userId
                 )
                 _connectedPeers.update { list -> (list.filter { it.endpointId != endpointId } + connectedPeer) }
-                Log.d(tag, "Successfully connected to endpoint: $endpointId")
+                Log.d(tag, "Successfully connected to endpoint: $endpointId ($name - $userId)")
+
+                scope.launch {
+                    _peerConnectedEvents.emit(connectedPeer)
+                }
             } else {
+                pendingConnectionInfo.remove(endpointId)
                 Log.w(tag, "Connection failed to endpoint: $endpointId code: ${resolution.status.statusCode}")
             }
         }
 
         override fun onDisconnected(endpointId: String) {
             Log.d(tag, "Disconnected from endpoint: $endpointId")
+            pendingConnectionInfo.remove(endpointId)
             _connectedPeers.update { list -> list.filter { it.endpointId != endpointId } }
             scope.launch {
                 _peerDisconnectedEvents.emit(endpointId)

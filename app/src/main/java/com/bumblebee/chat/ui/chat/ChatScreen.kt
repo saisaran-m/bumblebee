@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,6 +27,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.outlined.AddPhotoAlternate
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,10 +47,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import com.bumblebee.chat.core.theme.BumblebeeBackground
 import com.bumblebee.chat.core.theme.BumblebeeHoneyAccent
 import com.bumblebee.chat.core.theme.BumblebeeOnlineDot
@@ -60,6 +72,7 @@ import com.bumblebee.chat.core.theme.BumblebeeTextPrimary
 import com.bumblebee.chat.core.theme.BumblebeeTextSecondary
 import com.bumblebee.chat.domain.model.Message
 import com.bumblebee.chat.domain.model.MessageStatus
+import com.bumblebee.chat.domain.model.MessageType
 import com.bumblebee.chat.ui.components.HexagonAvatar
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -74,6 +87,40 @@ fun ChatScreen(
     val uiState by viewModel.uiState.collectAsState()
     val messages by viewModel.messages.collectAsState()
     val listState = rememberLazyListState()
+    val context = LocalContext.current
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            try {
+                val inputStream: InputStream? = context.contentResolver.openInputStream(it)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream?.close()
+                if (bitmap != null) {
+                    val maxDim = 800
+                    val scale = if (bitmap.width > maxDim || bitmap.height > maxDim) {
+                        maxDim.toFloat() / maxOf(bitmap.width, bitmap.height)
+                    } else 1f
+                    val scaledBitmap = if (scale < 1f) {
+                        Bitmap.createScaledBitmap(
+                            bitmap,
+                            (bitmap.width * scale).toInt(),
+                            (bitmap.height * scale).toInt(),
+                            true
+                        )
+                    } else bitmap
+
+                    val stream = ByteArrayOutputStream()
+                    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream)
+                    val bytes = stream.toByteArray()
+                    viewModel.sendImage(bytes)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     // Scroll to bottom when new messages arrive
     LaunchedEffect(messages.size) {
@@ -163,7 +210,8 @@ fun ChatScreen(
             SurfaceInputBar(
                 text = uiState.inputText,
                 onTextChanged = { viewModel.onInputTextChanged(it) },
-                onSendClicked = { viewModel.sendMessage() }
+                onSendClicked = { viewModel.sendMessage() },
+                onPhotoClicked = { imagePickerLauncher.launch("image/*") }
             )
         }
     }
@@ -208,13 +256,36 @@ private fun MessageBubble(message: Message) {
                     )
                     .padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
-                Text(
-                    text = message.content,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = BumblebeeTextPrimary,
-                        lineHeight = 20.sp
+                if (message.type == MessageType.IMAGE && !message.mediaUri.isNullOrEmpty()) {
+                    Column {
+                        AsyncImage(
+                            model = message.mediaUri,
+                            contentDescription = "Photo",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .sizeIn(maxWidth = 240.dp, maxHeight = 240.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                        )
+                        if (message.content.isNotBlank() && message.content != "Photo") {
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = message.content,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = BumblebeeTextPrimary,
+                                    lineHeight = 20.sp
+                                )
+                            )
+                        }
+                    }
+                } else {
+                    Text(
+                        text = message.content,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = BumblebeeTextPrimary,
+                            lineHeight = 20.sp
+                        )
                     )
-                )
+                }
             }
 
             // Timestamp and Delivery Status
@@ -283,18 +354,33 @@ private fun MessageBubble(message: Message) {
 private fun SurfaceInputBar(
     text: String,
     onTextChanged: (String) -> Unit,
-    onSendClicked: () -> Unit
+    onSendClicked: () -> Unit,
+    onPhotoClicked: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(BumblebeeSurface)
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
+            IconButton(
+                onClick = onPhotoClicked,
+                modifier = Modifier.size(42.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.AddPhotoAlternate,
+                    contentDescription = "Share Photo",
+                    tint = BumblebeePrimaryDark,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(4.dp))
+
             OutlinedTextField(
                 value = text,
                 onValueChange = onTextChanged,

@@ -56,6 +56,11 @@ fun BumblebeeNavGraph(
             MainScreen(
                 onNavigateToChat = { peerId ->
                     navController.navigate(Screen.Chat.createRoute(peerId))
+                },
+                onLogout = {
+                    navController.navigate(Screen.Onboarding.route) {
+                        popUpTo(Screen.Main.route) { inclusive = true }
+                    }
                 }
             )
         }

@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Fingerprint
@@ -70,6 +71,7 @@ import com.bumblebee.chat.ui.components.HexagonAvatar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
+    onLogout: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -79,6 +81,9 @@ fun SettingsScreen(
     var editedName by remember { mutableStateOf("") }
 
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showTopologyDialog by remember { mutableStateOf(false) }
+    var showEncryptionDialog by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
     var showPanicWipeDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -226,13 +231,41 @@ fun SettingsScreen(
                         icon = Icons.Outlined.PermDeviceInformation,
                         title = "Offline Mesh Topology",
                         subtitle = "P2P Cluster (Nearby Connections API)",
-                        onClick = {}
+                        onClick = { showTopologyDialog = true }
                     )
                     SettingsRow(
                         icon = Icons.Outlined.Shield,
                         title = "End-to-End Encryption",
-                        subtitle = "X25519 Key Exchange + AES-GCM (Phase 5)",
-                        onClick = {}
+                        subtitle = "AES-256-GCM + Android Hardware Keystore",
+                        onClick = { showEncryptionDialog = true }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Section: Account & Session
+            Text(
+                text = "Account & Session",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = BumblebeePrimaryDark
+                ),
+                modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
+            )
+
+            Card(
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(containerColor = BumblebeeSurface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, BumblebeeOutline),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column {
+                    SettingsRow(
+                        icon = Icons.AutoMirrored.Filled.Logout,
+                        title = "Leave Hive & Reset Profile",
+                        subtitle = "Disconnect from all peers and return to onboarding",
+                        onClick = { showLogoutDialog = true }
                     )
                 }
             }
@@ -435,6 +468,95 @@ fun SettingsScreen(
             dismissButton = {
                 TextButton(onClick = { showPanicWipeDialog = false }) {
                     Text("Cancel", color = BumblebeeTextSecondary)
+                }
+            }
+        )
+    }
+
+    // Leave Hive / Logout Dialog
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = {
+                Text(
+                    text = "Leave Hive & Reset Profile?",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            },
+            text = {
+                Text(
+                    text = "This will disconnect you from all nearby devices and reset your profile, allowing you to choose a new display name and avatar.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showLogoutDialog = false
+                        viewModel.logout { onLogout() }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = BumblebeePrimaryDark)
+                ) {
+                    Text("Leave Hive")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text("Cancel", color = BumblebeeTextSecondary)
+                }
+            }
+        )
+    }
+
+    // Offline Mesh Topology Dialog
+    if (showTopologyDialog) {
+        AlertDialog(
+            onDismissRequest = { showTopologyDialog = false },
+            title = {
+                Text(
+                    text = "Offline Mesh Topology",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            },
+            text = {
+                Text(
+                    text = "Bumblebee uses Google Nearby Connections P2P_CLUSTER. It uses Bluetooth Low Energy for discovery and Wi-Fi Direct for high-speed direct peer links without internet. Messages hop through intermediate devices (up to 7 hops) like bees passing pollen to reach neighbors beyond direct radio range.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showTopologyDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = BumblebeePrimaryDark)
+                ) {
+                    Text("Got it")
+                }
+            }
+        )
+    }
+
+    // Hardware Encryption Dialog
+    if (showEncryptionDialog) {
+        AlertDialog(
+            onDismissRequest = { showEncryptionDialog = false },
+            title = {
+                Text(
+                    text = "Hardware Encryption",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            },
+            text = {
+                Text(
+                    text = "All chats and messages are secured using AES-256-GCM. Encryption keys are securely generated and isolated inside your phone's Android Keystore hardware security module (TEE/StrongBox), ensuring zero cloud access and zero surveillance.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showEncryptionDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = BumblebeePrimaryDark)
+                ) {
+                    Text("Got it")
                 }
             }
         )

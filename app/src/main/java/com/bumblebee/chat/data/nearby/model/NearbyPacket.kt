@@ -26,7 +26,9 @@ data class NearbyPacket(
     val maxHops: Int = 7,
     val isEmergencySos: Boolean = false,
     val latitude: Double? = null,
-    val longitude: Double? = null
+    val longitude: Double? = null,
+    val mediaType: String? = null,
+    val mediaBase64: String? = null
 ) {
     enum class PacketType {
         HANDSHAKE,
@@ -60,6 +62,8 @@ data class NearbyPacket(
             put("isEmergencySos", isEmergencySos)
             if (latitude != null) put("latitude", latitude)
             if (longitude != null) put("longitude", longitude)
+            if (mediaType != null) put("mediaType", mediaType)
+            if (mediaBase64 != null) put("mediaBase64", mediaBase64)
         }
         return json.toString().toByteArray(Charsets.UTF_8)
     }
@@ -88,7 +92,9 @@ data class NearbyPacket(
                     maxHops = json.optInt("maxHops", 7),
                     isEmergencySos = json.optBoolean("isEmergencySos", false),
                     latitude = if (json.has("latitude")) json.optDouble("latitude") else null,
-                    longitude = if (json.has("longitude")) json.optDouble("longitude") else null
+                    longitude = if (json.has("longitude")) json.optDouble("longitude") else null,
+                    mediaType = json.optString("mediaType").takeIf { it.isNotEmpty() },
+                    mediaBase64 = json.optString("mediaBase64").takeIf { it.isNotEmpty() }
                 )
             } catch (e: Exception) {
                 null

@@ -45,8 +45,9 @@ class ChatViewModel @Inject constructor(
     private fun loadChat() {
         viewModelScope.launch {
             val peer = chatRepository.getPeer(peerIdArg)
-            var conv = conversationDao.getConversationByPeerId(peerIdArg)
-            val convId = conv?.conversationId ?: java.util.UUID.randomUUID().toString()
+            val canonicalPeerId = peer?.peerId ?: peerIdArg
+            val conv = chatRepository.getOrCreateConversation(canonicalPeerId, peer?.displayName)
+            val convId = conv.conversationId
 
             _uiState.value = _uiState.value.copy(
                 conversationId = convId,
@@ -77,6 +78,14 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatRepository.sendMessage(convId, peerIdArg, text)
             _uiState.value = _uiState.value.copy(isSending = false)
+        }
+    }
+
+    fun sendImage(imageBytes: ByteArray) {
+        val convId = _uiState.value.conversationId
+        if (convId.isBlank()) return
+        viewModelScope.launch {
+            chatRepository.sendImage(convId, peerIdArg, imageBytes)
         }
     }
 }

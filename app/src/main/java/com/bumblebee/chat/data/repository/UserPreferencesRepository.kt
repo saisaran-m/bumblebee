@@ -79,6 +79,12 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun resetProfile() {
+        dataStore.edit { prefs ->
+            prefs.clear()
+        }
+    }
+
     private fun generateUserId(): String {
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return "BB-" + (1..8).map { chars.random() }.joinToString("")
