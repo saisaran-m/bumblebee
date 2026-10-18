@@ -84,11 +84,27 @@
     }
 
     .glow-honey {
-      box-shadow: 0 0 35px -5px rgba(245, 197, 66, 0.25);
+      box-shadow: 0 0 40px -5px rgba(245, 197, 66, 0.28);
     }
 
     .glow-lavender {
-      box-shadow: 0 0 35px -5px rgba(155, 126, 222, 0.25);
+      box-shadow: 0 0 40px -5px rgba(155, 126, 222, 0.28);
+    }
+
+    /* Modern Card Sheen */
+    .card-sheen {
+      position: relative;
+      overflow: hidden;
+    }
+    .card-sheen::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+      transition: 0.5s;
+    }
+    .card-sheen:hover::before {
+      left: 100%;
     }
   </style>
 </head>
@@ -112,12 +128,13 @@
       </a>
 
       <!-- Desktop Links -->
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-brand-subtleText">
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-brand-subtleText">
         <a href="#simulator" class="hover:text-white transition-colors">Live Sim</a>
         <a href="#features" class="hover:text-white transition-colors">Features</a>
         <a href="#screenshots" class="hover:text-white transition-colors">Screenshots</a>
         <a href="#architecture" class="hover:text-white transition-colors">Architecture</a>
         <a href="#setup" class="hover:text-white transition-colors">Setup</a>
+        <a href="#about" class="hover:text-white transition-colors">About</a>
         <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
       </nav>
 
@@ -245,7 +262,7 @@
       </div>
 
       <!-- Simulator Board -->
-      <div class="bg-[#0E1016] border border-[#20222D] rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div class="bg-[#0E1016] border border-[#20222D] rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden card-sheen">
         
         <!-- Controls Bar -->
         <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#1E202B]">
@@ -255,7 +272,7 @@
           </div>
           
           <div class="flex items-center gap-3">
-            <span class="text-xs font-mono text-brand-subtleText">Airplane Mode:</span>
+            <span class="text-xs font-mono text-brand-subtleText">Air-Gap Status:</span>
             <button id="toggleAirplane" onclick="toggleAirplaneMode()" 
                     class="px-3 py-1 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all">
               Airplane Mode: ON (Air-Gapped)
@@ -353,7 +370,7 @@
     </div>
   </section>
 
-  <!-- ==================== APP SCREENSHOTS SHOWCASE ==================== -->
+  <!-- ==================== APP SCREENSHOTS & INTERACTIVE PREVIEW ==================== -->
   <section id="screenshots" class="py-24 border-t border-[#1C1D24] relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
@@ -364,13 +381,63 @@
         <p class="mt-4 text-brand-subtleText text-lg">
           No complicated mesh settings. Bumblebee automatically pairs devices, handles packet chunking, and maintains local chat history.
         </p>
+
+        <!-- Interactive Screen Switcher Tabs -->
+        <div class="mt-8 inline-flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl bg-[#12131C] border border-[#222433]">
+          <button onclick="switchScreenTab(0)" id="tab0" class="screen-tab px-4 py-2 rounded-xl text-xs font-bold transition-all bg-brand-honey text-black">
+            Honeycomb Chats
+          </button>
+          <button onclick="switchScreenTab(1)" id="tab1" class="screen-tab px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white">
+            Direct P2P Chat
+          </button>
+          <button onclick="switchScreenTab(2)" id="tab2" class="screen-tab px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white">
+            Emergency SOS
+          </button>
+          <button onclick="switchScreenTab(3)" id="tab3" class="screen-tab px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white">
+            Air-Gapped Profile
+          </button>
+        </div>
       </div>
 
-      <!-- 4 Screen Cards Grid -->
+      <!-- Interactive Featured Phone Showcase -->
+      <div class="mb-16 max-w-4xl mx-auto bg-[#0E1016] border border-[#20222F] rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col md:flex-row items-center gap-10">
+        <!-- Phone Mockup Container -->
+        <div class="w-[260px] sm:w-[280px] shrink-0 rounded-[38px] p-2.5 bg-[#1C1E2A] border-4 border-[#2D3042] shadow-2xl">
+          <div class="w-full aspect-[9/19] rounded-[30px] overflow-hidden bg-black border border-[#252838] relative">
+            <img id="featuredScreenImg" src="screenshots/chats_screen.png" alt="Featured App Screen" class="w-full h-full object-cover transition-opacity duration-300" />
+          </div>
+        </div>
+
+        <!-- Dynamic Screen Details -->
+        <div class="flex-1 space-y-5 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-honey/10 border border-brand-honey/20 text-xs font-mono text-brand-honey">
+            <span id="featuredBadge">SCREEN 01 OF 04</span>
+          </div>
+          <h3 id="featuredTitle" class="text-2xl sm:text-3xl font-extrabold text-white">
+            Honeycomb Chats
+          </h3>
+          <p id="featuredDesc" class="text-sm sm:text-base text-brand-subtleText leading-relaxed">
+            Real-time peer discovery view. Neighboring devices show up with their custom avatars, live online connection indicators, and unread badges. One tap opens an encrypted direct radio line.
+          </p>
+          
+          <div class="pt-4 border-t border-[#1C1E2A] grid grid-cols-2 gap-4 text-left">
+            <div class="bg-[#12131A] p-3 rounded-xl border border-[#1E202B]">
+              <div class="text-[11px] font-mono text-brand-subtleText">Security State</div>
+              <div id="featuredSpec1" class="text-xs font-bold text-white mt-0.5">Curve25519 Verified</div>
+            </div>
+            <div class="bg-[#12131A] p-3 rounded-xl border border-[#1E202B]">
+              <div class="text-[11px] font-mono text-brand-subtleText">Carrier Link</div>
+              <div id="featuredSpec2" class="text-xs font-bold text-brand-honey mt-0.5">Direct Wi-Fi Tunnel</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Screen Cards Gallery Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <!-- Screen 1: Chats Screen -->
-        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-brand-lavender/50 transition-all group">
+        <div onclick="switchScreenTab(0)" class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-brand-honey/50 transition-all cursor-pointer group">
           <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
             <img src="screenshots/chats_screen.png" alt="Chats Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           </div>
@@ -386,7 +453,7 @@
         </div>
 
         <!-- Screen 2: Direct Chat -->
-        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-brand-lavender/50 transition-all group">
+        <div onclick="switchScreenTab(1)" class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-brand-lavender/50 transition-all cursor-pointer group">
           <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
             <img src="screenshots/chat_screen.png" alt="Direct Chat Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           </div>
@@ -402,7 +469,7 @@
         </div>
 
         <!-- Screen 3: Emergency SOS -->
-        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-rose-500/50 transition-all group">
+        <div onclick="switchScreenTab(2)" class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-rose-500/50 transition-all cursor-pointer group">
           <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
             <img src="screenshots/buzz_sos_screen.png" alt="Emergency SOS Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           </div>
@@ -418,7 +485,7 @@
         </div>
 
         <!-- Screen 4: Settings -->
-        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-brand-lavender/50 transition-all group">
+        <div onclick="switchScreenTab(3)" class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-emerald-400/50 transition-all cursor-pointer group">
           <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
             <img src="screenshots/settings_screen.png" alt="Settings Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           </div>
@@ -454,7 +521,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         <!-- Feature 1 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-honey/40 transition-colors">
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-honey/40 transition-colors card-sheen">
           <div class="w-12 h-12 rounded-2xl bg-brand-honey/10 border border-brand-honey/20 flex items-center justify-center text-brand-honey mb-6">
             <i data-lucide="wifi-off" class="w-6 h-6"></i>
           </div>
@@ -465,7 +532,7 @@
         </div>
 
         <!-- Feature 2 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-lavender/40 transition-colors">
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-lavender/40 transition-colors card-sheen">
           <div class="w-12 h-12 rounded-2xl bg-brand-lavender/10 border border-brand-lavender/20 flex items-center justify-center text-brand-lavender mb-6">
             <i data-lucide="mic" class="w-6 h-6"></i>
           </div>
@@ -476,7 +543,7 @@
         </div>
 
         <!-- Feature 3 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-honey/40 transition-colors">
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-honey/40 transition-colors card-sheen">
           <div class="w-12 h-12 rounded-2xl bg-brand-honey/10 border border-brand-honey/20 flex items-center justify-center text-brand-honey mb-6">
             <i data-lucide="image" class="w-6 h-6"></i>
           </div>
@@ -487,7 +554,7 @@
         </div>
 
         <!-- Feature 4 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-emerald-400/40 transition-colors">
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-emerald-400/40 transition-colors card-sheen">
           <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6">
             <i data-lucide="key" class="w-6 h-6"></i>
           </div>
@@ -498,7 +565,7 @@
         </div>
 
         <!-- Feature 5 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-rose-500/40 transition-colors">
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-rose-500/40 transition-colors card-sheen">
           <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 mb-6">
             <i data-lucide="alert-octagon" class="w-6 h-6"></i>
           </div>
@@ -509,7 +576,7 @@
         </div>
 
         <!-- Feature 6 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-lavender/40 transition-colors">
+        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-lavender/40 transition-colors card-sheen">
           <div class="w-12 h-12 rounded-2xl bg-brand-lavender/10 border border-brand-lavender/20 flex items-center justify-center text-brand-lavender mb-6">
             <i data-lucide="lock" class="w-6 h-6"></i>
           </div>
@@ -659,8 +726,168 @@
     </div>
   </section>
 
+  <!-- ==================== ABOUT SECTION (MISSION & STORY) ==================== -->
+  <section id="about" class="py-24 border-t border-[#1C1D24] relative overflow-hidden">
+    
+    <!-- Background subtle glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-brand-honey/5 blur-[150px] pointer-events-none"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-honey/10 border border-brand-honey/20 text-xs font-mono text-brand-honey uppercase tracking-wider mb-4">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          The Story Behind Bumblebee
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+          Communication is a human right.<br class="hidden sm:inline" />
+          Even when the grid goes dark.
+        </h2>
+        <p class="mt-4 text-brand-subtleText text-base sm:text-lg leading-relaxed">
+          In a world interconnected by centralized undersea cables and cell towers, a single hurricane, earthquake, power outage, or government shutdown can silence millions. Bumblebee was built to restore sovereignty to local communication.
+        </p>
+      </div>
+
+      <!-- 3 Core Philosophy Pillars -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        
+        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-8 card-sheen">
+          <div class="w-12 h-12 rounded-2xl bg-brand-honey/10 border border-brand-honey/20 flex items-center justify-center text-brand-honey mb-6">
+            <i data-lucide="radio-tower" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white">01. Total Grid Resilience</h3>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
+            When natural disasters flood cell stations or festivals overload networks, every smartphone running Bumblebee transforms into an ad-hoc local transmission node. No single point of failure can take the network down.
+          </p>
+        </div>
+
+        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-8 card-sheen">
+          <div class="w-12 h-12 rounded-2xl bg-brand-lavender/10 border border-brand-lavender/20 flex items-center justify-center text-brand-lavender mb-6">
+            <i data-lucide="eye-off" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white">02. Uncompromised Privacy</h3>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
+            Centralized messengers log your metadata, phone numbers, and IP addresses. Bumblebee creates an ephemeral air-gapped radio tunnel between devices. When communication never touches the cloud, surveillance is impossible.
+          </p>
+        </div>
+
+        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-8 card-sheen">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6">
+            <i data-lucide="heart" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white">03. 100% Free & Open Source</h3>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
+            Licensed under the permissive MIT License. No venture paywalls, no recurring subscriptions, and zero ads. The entire codebase is transparent, auditable, and built for global community benefit.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Startup Defensibility Matrix (Comparison Table) -->
+      <div class="bg-[#0E1016] border border-[#20222F] rounded-3xl p-6 sm:p-8 mb-16 overflow-x-auto shadow-2xl">
+        <div class="mb-6">
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="layers" class="w-5 h-5 text-brand-honey"></i>
+            How Bumblebee Compares
+          </h3>
+          <p class="text-xs text-brand-subtleText mt-1">
+            Engineered specifically for zero-connectivity off-grid operations where standard messengers fail.
+          </p>
+        </div>
+
+        <table class="w-full text-left text-xs sm:text-sm">
+          <thead>
+            <tr class="border-b border-[#202230] text-brand-subtleText font-mono uppercase text-[11px]">
+              <th class="py-3 px-3">Capability</th>
+              <th class="py-3 px-3 text-brand-honey font-bold">Bumblebee</th>
+              <th class="py-3 px-3 text-zinc-400">WhatsApp / Signal</th>
+              <th class="py-3 px-3 text-zinc-400">Bridgefy</th>
+              <th class="py-3 px-3 text-zinc-400">Briar</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#1A1C28] text-zinc-300">
+            <tr>
+              <td class="py-3.5 px-3 font-semibold text-white">Internet Needed?</td>
+              <td class="py-3.5 px-3 text-emerald-400 font-bold">Zero (100% Offline)</td>
+              <td class="py-3.5 px-3 text-rose-400">Mandatory</td>
+              <td class="py-3.5 px-3 text-emerald-400">Zero</td>
+              <td class="py-3.5 px-3 text-emerald-400">Zero</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-3 font-semibold text-white">Phone # / SIM Required?</td>
+              <td class="py-3.5 px-3 text-emerald-400 font-bold">No (Anonymous)</td>
+              <td class="py-3.5 px-3 text-rose-400">Mandatory SIM</td>
+              <td class="py-3.5 px-3 text-emerald-400">No</td>
+              <td class="py-3.5 px-3 text-emerald-400">No</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-3 font-semibold text-white">High-Speed Wi-Fi Direct?</td>
+              <td class="py-3.5 px-3 text-brand-honey font-bold">Yes (250 Mbps)</td>
+              <td class="py-3.5 px-3 text-zinc-500">Cloud Only</td>
+              <td class="py-3.5 px-3 text-rose-400">No (BLE Only ~128kbps)</td>
+              <td class="py-3.5 px-3 text-zinc-400">Bluetooth/Tor</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-3 font-semibold text-white">1280px HD Photo Sharing?</td>
+              <td class="py-3.5 px-3 text-brand-honey font-bold">Yes (Nectar Engine)</td>
+              <td class="py-3.5 px-3 text-zinc-300">Yes (Online)</td>
+              <td class="py-3.5 px-3 text-rose-400">Low-res thumbnails</td>
+              <td class="py-3.5 px-3 text-zinc-500">Limited</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-3 font-semibold text-white">Push-To-Talk Voice Walkie-Talkie?</td>
+              <td class="py-3.5 px-3 text-brand-honey font-bold">Yes (22kHz AAC)</td>
+              <td class="py-3.5 px-3 text-zinc-300">Online Voice</td>
+              <td class="py-3.5 px-3 text-rose-400">Not Supported</td>
+              <td class="py-3.5 px-3 text-rose-400">Not Supported</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-3 font-semibold text-white">Emergency SOS with Live GPS & Battery?</td>
+              <td class="py-3.5 px-3 text-brand-honey font-bold">Yes (Rich Telemetry)</td>
+              <td class="py-3.5 px-3 text-rose-400">No Offline GPS</td>
+              <td class="py-3.5 px-3 text-zinc-400">Text Only</td>
+              <td class="py-3.5 px-3 text-rose-400">Not Supported</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Creator Bio Card -->
+      <div class="bg-gradient-to-r from-[#11131C] to-[#0D0F17] border border-[#232635] rounded-3xl p-8 flex flex-col sm:flex-row items-center gap-8 shadow-xl">
+        <div class="w-20 h-20 rounded-2xl bg-brand-honey/10 border-2 border-brand-honey/30 flex items-center justify-center text-4xl shrink-0 glow-honey">
+          🐝
+        </div>
+        <div class="flex-1 text-center sm:text-left">
+          <div class="inline-flex items-center gap-1.5 text-xs font-mono uppercase text-brand-honey tracking-wider mb-1">
+            <span>Open Source Project</span>
+            <span>•</span>
+            <span>Created by Saisaran M</span>
+          </div>
+          <h4 class="text-xl font-bold text-white">
+            Built with modern Android engineering.
+          </h4>
+          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+            Crafted using Kotlin 2.1, Jetpack Compose, Material 3, Dagger Hilt, Room SQLite, and Google Play Services Nearby Connections. Open to global contributions and community development.
+          </p>
+          <div class="mt-4 flex flex-wrap items-center justify-center sm:justify-start gap-4">
+            <a href="https://github.com/saisaran-m" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 text-xs font-bold text-white bg-[#191B26] hover:bg-[#222533] px-3.5 py-2 rounded-lg border border-[#2B2E3E] transition-colors">
+              <i data-lucide="github" class="w-3.5 h-3.5"></i>
+              <span>@saisaran-m</span>
+            </a>
+            <a href="https://github.com/saisaran-m/bumblebee" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 text-xs font-bold text-brand-honey hover:underline">
+              <span>View Source Repository →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- ==================== FAQ ACCORDION ==================== -->
-  <section id="faq" class="py-24 border-t border-[#1C1D24] relative">
+  <section id="faq" class="py-24 border-t border-[#1C1D24] relative bg-[#08090D]">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <div class="text-center max-w-2xl mx-auto mb-16">
@@ -675,44 +902,59 @@
       <div class="space-y-4">
         
         <!-- Q1 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
-          <h4 class="text-base font-bold text-white">Does Bumblebee really work with zero internet?</h4>
-          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+        <details class="group bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 open:border-brand-honey/30 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-white text-base">
+            <span>Does Bumblebee really work with zero internet?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-brand-subtleText group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
             Yes, 100%. Bumblebee communicates purely through physical radio waves (Bluetooth Low Energy and Wi-Fi Direct). No cell towers, SIM cards, Wi-Fi routers, or internet service providers are ever used.
           </p>
-        </div>
+        </details>
 
         <!-- Q2 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
-          <h4 class="text-base font-bold text-white">What is the communication range?</h4>
-          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+        <details class="group bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 open:border-brand-honey/30 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-white text-base">
+            <span>What is the communication range?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-brand-subtleText group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
             Direct peer-to-peer range typically spans 30 to 100+ meters in open air or clear line-of-sight. In multi-hop mesh mode, packets hop across intermediate devices up to 7 hops away.
           </p>
-        </div>
+        </details>
 
         <!-- Q3 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
-          <h4 class="text-base font-bold text-white">Why does it need Location permission on Android?</h4>
-          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+        <details class="group bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 open:border-brand-honey/30 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-white text-base">
+            <span>Why does it need Location permission on Android?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-brand-subtleText group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
             Google Android's security architecture mandates Location permission for apps performing Bluetooth scanning and Wi-Fi Direct discovery. Bumblebee uses this solely for radio device discovery and never uploads your location to any server.
           </p>
-        </div>
+        </details>
 
         <!-- Q4 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
-          <h4 class="text-base font-bold text-white">How does Bumblebee send high-resolution photos offline?</h4>
-          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+        <details class="group bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 open:border-brand-honey/30 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-white text-base">
+            <span>How does Bumblebee send high-resolution photos offline?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-brand-subtleText group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
             Standard Google Nearby Connections has a 32 KB limit on single payloads. Bumblebee's proprietary Nectar engine slices 1280px photos into 18KB chunk packets and reassembles them smoothly on the receiving device with zero visual degradation.
           </p>
-        </div>
+        </details>
 
         <!-- Q5 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
-          <h4 class="text-base font-bold text-white">Is it open-source?</h4>
-          <p class="mt-2 text-sm text-brand-subtleText leading-relaxed">
+        <details class="group bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 open:border-brand-honey/30 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-white text-base">
+            <span>Is it open-source?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-brand-subtleText group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="mt-3 text-sm text-brand-subtleText leading-relaxed">
             Yes! Bumblebee is completely open-source under the permissive MIT License. You can review the code, build from scratch, or contribute on GitHub.
           </p>
-        </div>
+        </details>
 
       </div>
     </div>
@@ -762,6 +1004,7 @@
       </div>
 
       <div class="flex items-center gap-6 text-sm text-brand-subtleText">
+        <a href="#about" class="hover:text-white transition-colors">About</a>
         <a href="https://github.com/saisaran-m/bumblebee" class="hover:text-white transition-colors">GitHub</a>
         <a href="https://github.com/saisaran-m/bumblebee/releases" class="hover:text-white transition-colors">Releases</a>
         <a href="https://github.com/saisaran-m/bumblebee/blob/main/LICENSE" class="hover:text-white transition-colors">MIT License</a>
@@ -770,13 +1013,98 @@
     </div>
   </footer>
 
-  <!-- ==================== INTERACTIVE SIMULATOR SCRIPT ==================== -->
+  <!-- ==================== INTERACTIVE SCRIPTS ==================== -->
   <script>
     lucide.createIcons();
 
-    let isAirplaneOn = true;
+    // Sound FX synthesizer using Web Audio API
+    let audioCtx = null;
+    function playBeep(freq = 600, type = 'sine', duration = 0.08) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
 
+    // Interactive Screen Switcher State
+    const screenData = [
+      {
+        badge: "SCREEN 01 OF 04",
+        img: "screenshots/chats_screen.png",
+        title: "Honeycomb Chats",
+        desc: "Real-time peer discovery view. Neighboring devices show up with their custom avatars, live online connection indicators, and unread badges. One tap opens an encrypted direct radio line.",
+        spec1: "Curve25519 Verified",
+        spec2: "Direct Wi-Fi Tunnel"
+      },
+      {
+        badge: "SCREEN 02 OF 04",
+        img: "screenshots/chat_screen.png",
+        title: "Direct P2P Chat & Push-To-Talk",
+        desc: "One-on-one encrypted messenger with real-time delivery state checkmarks (Sending, Sent, Delivered, Read). Includes hold-to-talk walkie-talkie voice notes and 1280px crystal-clear photo streaming.",
+        spec1: "18KB Chunk Engine",
+        spec2: "AAC-LC Audio 32kbps"
+      },
+      {
+        badge: "SCREEN 03 OF 04",
+        img: "screenshots/buzz_sos_screen.png",
+        title: "Emergency Distress SOS Beacon",
+        desc: "Instant air-gapped distress alert. Queries device GPS satellites and hardware battery status, broadcasting a rich Google Maps link and battery level telemetry across physical radio space.",
+        spec1: "GPS Telemetry Attached",
+        spec2: "Hardware Battery % Sync"
+      },
+      {
+        badge: "SCREEN 04 OF 04",
+        img: "screenshots/settings_screen.png",
+        title: "Air-Gapped Profile & Privacy",
+        desc: "Complete sovereignty over your local device session. Edit your display name, choose custom avatar bee emojis, manage local storage, and verify hardware cryptographic keys with zero cloud sync.",
+        spec1: "100% Zero Cloud",
+        spec2: "MIT Open Source"
+      }
+    ];
+
+    function switchScreenTab(index) {
+      playBeep(450, 'sine', 0.05);
+
+      // Update Tab Styles
+      for (let i = 0; i < 4; i++) {
+        const tab = document.getElementById(`tab${i}`);
+        if (i === index) {
+          tab.className = 'screen-tab px-4 py-2 rounded-xl text-xs font-bold transition-all bg-brand-honey text-black';
+        } else {
+          tab.className = 'screen-tab px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white';
+        }
+      }
+
+      // Update Featured Content
+      const data = screenData[index];
+      const imgElem = document.getElementById('featuredScreenImg');
+      imgElem.style.opacity = '0';
+      setTimeout(() => {
+        imgElem.src = data.img;
+        imgElem.style.opacity = '1';
+      }, 150);
+
+      document.getElementById('featuredBadge').textContent = data.badge;
+      document.getElementById('featuredTitle').textContent = data.title;
+      document.getElementById('featuredDesc').textContent = data.desc;
+      document.getElementById('featuredSpec1').textContent = data.spec1;
+      document.getElementById('featuredSpec2').textContent = data.spec2;
+    }
+
+    // Airplane Mode Simulation
+    let isAirplaneOn = true;
     function toggleAirplaneMode() {
+      playBeep(520, 'sine', 0.08);
       isAirplaneOn = !isAirplaneOn;
       const btn = document.getElementById('toggleAirplane');
       if (isAirplaneOn) {
@@ -793,6 +1121,7 @@
       const text = input.value.trim();
       if (!text) return;
       input.value = '';
+      playBeep(880, 'sine', 0.06);
 
       const phoneA = document.getElementById('phoneAMessages');
       const phoneB = document.getElementById('phoneBMessages');
@@ -825,6 +1154,7 @@
 
       // Receive on B after 150ms simulated radio flight
       setTimeout(() => {
+        playBeep(1100, 'sine', 0.08);
         const msgDivB = document.createElement('div');
         msgDivB.className = 'flex justify-start';
         msgDivB.innerHTML = `
@@ -841,6 +1171,7 @@
     }
 
     function sendSimVoice() {
+      playBeep(650, 'triangle', 0.12);
       const phoneA = document.getElementById('phoneAMessages');
       const phoneB = document.getElementById('phoneBMessages');
 
@@ -868,6 +1199,7 @@
       packetStatus.className = "text-amber-400";
 
       setTimeout(() => {
+        playBeep(1200, 'sine', 0.1);
         const voiceDivB = document.createElement('div');
         voiceDivB.className = 'flex justify-start';
         voiceDivB.innerHTML = `
@@ -880,7 +1212,7 @@
         phoneB.scrollTop = phoneB.scrollHeight;
         packetStatus.textContent = "ACK_DELIVERED (0.1ms radio latency)";
         packetStatus.className = "text-emerald-400";
-      }, 200);
+      }, 220);
     }
 
     function escapeHtml(string) {
