@@ -1,5 +1,11 @@
 # Bumblebee
 
+[![Latest Release](https://img.shields.io/github/v/release/saisaran-m/bumblebee?color=9B7EDE&label=Latest%20Release)](https://github.com/saisaran-m/bumblebee/releases/latest)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(v1.0.0)-F5C542?logo=android&logoColor=white)](https://github.com/saisaran-m/bumblebee/releases/latest/download/bumblebee.apk)
+[![License: MIT](https://img.shields.io/badge/License-MIT-7C5CBF.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
+[![Offline](https://img.shields.io/badge/Network-100%25%20Offline%20P2P-black)](#key-features)
+
 Bumblebee is an open-source, 100% offline peer-to-peer (P2P) communication app for Android. It enables smartphones to discover, connect, chat, and share photos directly without an active internet connection, cellular data, or external Wi-Fi routers.
 
 Designed for off-grid scenarios such as natural disasters, remote hiking, flights, crowded events, or regions with poor network infrastructure, Bumblebee turns mobile devices into an ad-hoc local mesh network.
