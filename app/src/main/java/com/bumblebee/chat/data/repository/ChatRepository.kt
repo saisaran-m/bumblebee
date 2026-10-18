@@ -51,6 +51,49 @@ class ChatRepository @Inject constructor(
     init {
         observeIncomingPackets()
         observePeerConnections()
+        cleanupDuplicateConversations()
+    }
+
+    private fun cleanupDuplicateConversations() {
+        scope.launch {
+            try {
+                val allConvs = conversationDao.getAllConversationsSync()
+                val peerConvs = allConvs.filter { !it.isHive && !it.peerId.isNullOrBlank() }
+
+                val peers = peerDao.getAllPeers().first()
+                val endpointToPeerMap = peers.mapNotNull { p -> p.endpointId?.let { it to p.peerId } }.toMap()
+
+                val grouped = peerConvs.groupBy { conv ->
+                    val pid = conv.peerId!!
+                    endpointToPeerMap[pid] ?: pid
+                }
+
+                for ((canonicalPid, convList) in grouped) {
+                    if (convList.size > 1) {
+                        val sorted = convList.sortedByDescending { it.lastMessageTimestamp }
+                        val primary = sorted.first()
+                        val duplicates = sorted.drop(1)
+                        val duplicateIds = duplicates.map { it.conversationId }
+
+                        messageDao.migrateMessagesToConversation(duplicateIds, primary.conversationId)
+                        conversationDao.deleteByIds(duplicateIds)
+
+                        val lastMsg = messageDao.getLastMessage(primary.conversationId)
+                        val unread = messageDao.getUnreadCount(primary.conversationId)
+                        conversationDao.insertOrUpdate(
+                            primary.copy(
+                                peerId = canonicalPid,
+                                lastMessage = if (lastMsg?.type == "IMAGE") "📷 Photo" else lastMsg?.content ?: primary.lastMessage,
+                                lastMessageTimestamp = lastMsg?.timestamp ?: primary.lastMessageTimestamp,
+                                unreadCount = unread
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                // Log and continue safely
+            }
+        }
     }
 
     private fun observeIncomingPackets() {
@@ -77,6 +120,9 @@ class ChatRepository @Inject constructor(
             nearbyManager.peerConnectedEvents.collect { peer ->
                 val peerId = peer.userId.ifBlank { peer.endpointId }
                 val existing = peerDao.getPeerById(peerId) ?: peerDao.getPeerByEndpointId(peer.endpointId)
+                if (existing != null && existing.peerId != peerId) {
+                    peerDao.deleteById(existing.peerId)
+                }
                 val updated = (existing ?: PeerEntity(
                     peerId = peerId,
                     displayName = peer.displayName,
@@ -117,6 +163,9 @@ class ChatRepository @Inject constructor(
                 connectedList.forEach { peer ->
                     val peerId = peer.userId.ifBlank { peer.endpointId }
                     val existing = peerDao.getPeerById(peerId) ?: peerDao.getPeerByEndpointId(peer.endpointId)
+                    if (existing != null && existing.peerId != peerId) {
+                        peerDao.deleteById(existing.peerId)
+                    }
                     val updated = (existing ?: PeerEntity(
                         peerId = peerId,
                         displayName = peer.displayName,
@@ -145,32 +194,61 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun getOrCreateConversation(peerId: String, peerName: String? = null): ConversationEntity {
-        var conv = conversationDao.getConversationByPeerId(peerId)
-        if (conv == null) {
-            val peer = peerDao.getPeerById(peerId) ?: peerDao.getPeerByEndpointId(peerId)
-            if (peer != null) {
-                if (peer.peerId != peerId) {
-                    conv = conversationDao.getConversationByPeerId(peer.peerId)
-                }
-                if (conv == null && peer.endpointId != null && peer.endpointId != peerId) {
-                    conv = conversationDao.getConversationByPeerId(peer.endpointId)
+    suspend fun getOrCreateConversation(peerIdOrEndpoint: String, peerName: String? = null): ConversationEntity {
+        // 1. Resolve canonical peerId and endpointId
+        val peer = peerDao.getPeerById(peerIdOrEndpoint) ?: peerDao.getPeerByEndpointId(peerIdOrEndpoint)
+        val canonicalPeerId = peer?.peerId?.takeIf { it.isNotBlank() } ?: peerIdOrEndpoint
+        val endpointId = peer?.endpointId
+
+        // 2. Candidate peer IDs that could have been used in past conversations
+        val candidateIds = listOfNotNull(canonicalPeerId, endpointId, peerIdOrEndpoint).distinct()
+
+        // 3. Find all existing conversations matching ANY candidate peer ID
+        val matchingConvs = mutableListOf<ConversationEntity>()
+        for (id in candidateIds) {
+            val list = conversationDao.getAllConversationsByPeerId(id)
+            for (c in list) {
+                if (matchingConvs.none { it.conversationId == c.conversationId }) {
+                    matchingConvs.add(c)
                 }
             }
         }
-        if (conv == null) {
-            val newConv = ConversationEntity(
-                conversationId = UUID.randomUUID().toString(),
-                peerId = peerId,
-                isHive = false,
-                lastMessage = if (peerName != null) "Connected with $peerName" else null,
-                lastMessageTimestamp = System.currentTimeMillis(),
-                unreadCount = 0
+
+        if (matchingConvs.isNotEmpty()) {
+            matchingConvs.sortByDescending { it.lastMessageTimestamp }
+            val primaryConv = matchingConvs.first()
+            val duplicateConvs = matchingConvs.drop(1)
+
+            if (duplicateConvs.isNotEmpty()) {
+                val duplicateIds = duplicateConvs.map { it.conversationId }
+                messageDao.migrateMessagesToConversation(duplicateIds, primaryConv.conversationId)
+                conversationDao.deleteByIds(duplicateIds)
+            }
+
+            val lastMsg = messageDao.getLastMessage(primaryConv.conversationId)
+            val unread = messageDao.getUnreadCount(primaryConv.conversationId)
+
+            val updatedPrimary = primaryConv.copy(
+                peerId = canonicalPeerId,
+                lastMessage = if (lastMsg?.type == "IMAGE") "📷 Photo" else lastMsg?.content ?: primaryConv.lastMessage ?: (if (peerName != null) "Connected with $peerName" else null),
+                lastMessageTimestamp = lastMsg?.timestamp ?: primaryConv.lastMessageTimestamp,
+                unreadCount = unread
             )
-            conversationDao.insertOrUpdate(newConv)
-            return newConv
+            conversationDao.insertOrUpdate(updatedPrimary)
+            return updatedPrimary
         }
-        return conv
+
+        // 4. Create new conversation if none existed
+        val newConv = ConversationEntity(
+            conversationId = UUID.randomUUID().toString(),
+            peerId = canonicalPeerId,
+            isHive = false,
+            lastMessage = if (peerName != null) "Connected with $peerName" else null,
+            lastMessageTimestamp = System.currentTimeMillis(),
+            unreadCount = 0
+        )
+        conversationDao.insertOrUpdate(newConv)
+        return newConv
     }
 
     private fun saveReceivedImage(messageId: String, base64Data: String): String? {
@@ -270,6 +348,9 @@ class ChatRepository @Inject constructor(
     private suspend fun handleHandshake(endpointId: String, packet: NearbyPacket) {
         val peerId = packet.senderId.ifBlank { endpointId }
         val existing = peerDao.getPeerById(peerId) ?: peerDao.getPeerByEndpointId(endpointId)
+        if (existing != null && existing.peerId != peerId) {
+            peerDao.deleteById(existing.peerId)
+        }
         val peer = (existing ?: PeerEntity(
             peerId = peerId,
             displayName = packet.senderName,
@@ -301,11 +382,14 @@ class ChatRepository @Inject constructor(
             peerDao.getAllPeers()
         ) { conversations, peers ->
             val peerMap = peers.associateBy { it.peerId }
-            conversations.map { entity ->
-                val peer = entity.peerId?.let { peerMap[it] }
+            val endpointToPeerMap = peers.filter { it.endpointId != null }.associateBy { it.endpointId!! }
+
+            val mapped = conversations.map { entity ->
+                val peer = entity.peerId?.let { peerMap[it] ?: endpointToPeerMap[it] }
+                val canonicalPeerId = peer?.peerId ?: entity.peerId
                 Conversation(
                     conversationId = entity.conversationId,
-                    peerId = entity.peerId,
+                    peerId = canonicalPeerId,
                     hiveName = entity.hiveName,
                     isHive = entity.isHive,
                     lastMessage = entity.lastMessage,
@@ -319,6 +403,23 @@ class ChatRepository @Inject constructor(
                     isOnline = peer?.isConnected ?: false
                 )
             }
+
+            // Deduplicate: If multiple conversations exist for the same peerId, show only the latest one
+            val deduplicated = mutableListOf<Conversation>()
+            val seenPeerIds = mutableSetOf<String>()
+
+            for (conv in mapped) {
+                if (conv.isHive) {
+                    deduplicated.add(conv)
+                } else {
+                    val pid = conv.peerId ?: conv.conversationId
+                    if (!seenPeerIds.contains(pid)) {
+                        seenPeerIds.add(pid)
+                        deduplicated.add(conv)
+                    }
+                }
+            }
+            deduplicated
         }
     }
 

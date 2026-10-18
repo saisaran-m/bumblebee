@@ -30,6 +30,9 @@ interface PeerDao {
     @Delete
     suspend fun delete(peer: PeerEntity)
 
+    @Query("DELETE FROM peers WHERE peerId = :peerId")
+    suspend fun deleteById(peerId: String)
+
     @Query("UPDATE peers SET isConnected = 0, isNearby = 0, endpointId = NULL")
     suspend fun disconnectAll()
 

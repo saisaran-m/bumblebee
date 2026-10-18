@@ -1,6 +1,8 @@
 package com.bumblebee.chat.ui.chat
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.window.Dialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +45,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -88,6 +93,7 @@ fun ChatScreen(
     val messages by viewModel.messages.collectAsState()
     val listState = rememberLazyListState()
     val context = LocalContext.current
+    var previewImageUri by remember { mutableStateOf<String?>(null) }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -98,23 +104,10 @@ fun ChatScreen(
                 val bitmap = BitmapFactory.decodeStream(inputStream)
                 inputStream?.close()
                 if (bitmap != null) {
-                    val maxDim = 800
-                    val scale = if (bitmap.width > maxDim || bitmap.height > maxDim) {
-                        maxDim.toFloat() / maxOf(bitmap.width, bitmap.height)
-                    } else 1f
-                    val scaledBitmap = if (scale < 1f) {
-                        Bitmap.createScaledBitmap(
-                            bitmap,
-                            (bitmap.width * scale).toInt(),
-                            (bitmap.height * scale).toInt(),
-                            true
-                        )
-                    } else bitmap
-
-                    val stream = ByteArrayOutputStream()
-                    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream)
-                    val bytes = stream.toByteArray()
-                    viewModel.sendImage(bytes)
+                    val bytes = compressImageForP2P(bitmap)
+                    if (bytes != null) {
+                        viewModel.sendImage(bytes)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -202,7 +195,10 @@ fun ChatScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(messages, key = { it.messageId }) { message ->
-                    MessageBubble(message = message)
+                    MessageBubble(
+                        message = message,
+                        onImageClick = { uri -> previewImageUri = uri }
+                    )
                 }
             }
 
@@ -214,11 +210,34 @@ fun ChatScreen(
                 onPhotoClicked = { imagePickerLauncher.launch("image/*") }
             )
         }
+
+        if (previewImageUri != null) {
+            Dialog(onDismissRequest = { previewImageUri = null }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable { previewImageUri = null },
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = previewImageUri,
+                        contentDescription = "Full Image Preview",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxWidth(0.95f)
+                            .clip(RoundedCornerShape(16.dp))
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
-private fun MessageBubble(message: Message) {
+private fun MessageBubble(
+    message: Message,
+    onImageClick: (String) -> Unit = {}
+) {
     val isOutgoing = message.isOutgoing
     val timeFormatter = SimpleDateFormat("h:mm a", Locale.getDefault())
     val formattedTime = timeFormatter.format(Date(message.timestamp))
@@ -265,6 +284,7 @@ private fun MessageBubble(message: Message) {
                             modifier = Modifier
                                 .sizeIn(maxWidth = 240.dp, maxHeight = 240.dp)
                                 .clip(RoundedCornerShape(12.dp))
+                                .clickable { message.mediaUri?.let(onImageClick) }
                         )
                         if (message.content.isNotBlank() && message.content != "Photo") {
                             Spacer(modifier = Modifier.height(6.dp))
@@ -424,6 +444,56 @@ private fun SurfaceInputBar(
                     modifier = Modifier.size(20.dp)
                 )
             }
+        }
+    }
+}
+
+/**
+ * Compresses an image specifically for Google Nearby Connections BYTES payload.
+ * Strictly guarantees that the resulting JPEG byte array is <= 22,000 bytes,
+ * so the Base64 JSON payload remains safely below the 32,768 byte Nearby Connections limit.
+ */
+fun compressImageForP2P(originalBitmap: Bitmap): ByteArray? {
+    var maxDim = 600
+    var width = originalBitmap.width
+    var height = originalBitmap.height
+    val scale = if (width > maxDim || height > maxDim) {
+        maxDim.toFloat() / maxOf(width, height)
+    } else 1f
+
+    var currentBitmap = if (scale < 1f) {
+        Bitmap.createScaledBitmap(
+            originalBitmap,
+            (width * scale).toInt().coerceAtLeast(1),
+            (height * scale).toInt().coerceAtLeast(1),
+            true
+        )
+    } else originalBitmap
+
+    val maxBytes = 22_000
+    var quality = 70
+
+    while (true) {
+        val stream = ByteArrayOutputStream()
+        currentBitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
+        val resultBytes = stream.toByteArray()
+        if (resultBytes.size <= maxBytes) {
+            return resultBytes
+        }
+        quality -= 15
+        if (quality < 30) {
+            maxDim = (maxDim * 0.75).toInt()
+            if (maxDim < 180) {
+                return resultBytes
+            }
+            val newScale = maxDim.toFloat() / maxOf(originalBitmap.width, originalBitmap.height)
+            currentBitmap = Bitmap.createScaledBitmap(
+                originalBitmap,
+                (originalBitmap.width * newScale).toInt().coerceAtLeast(1),
+                (originalBitmap.height * newScale).toInt().coerceAtLeast(1),
+                true
+            )
+            quality = 60
         }
     }
 }

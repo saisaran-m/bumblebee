@@ -44,14 +44,21 @@ class ChatViewModel @Inject constructor(
 
     private fun loadChat() {
         viewModelScope.launch {
-            val peer = chatRepository.getPeer(peerIdArg)
-            val canonicalPeerId = peer?.peerId ?: peerIdArg
+            val existingConv = conversationDao.getConversationById(peerIdArg)
+            val targetPeerId = if (existingConv != null && !existingConv.isHive && !existingConv.peerId.isNullOrBlank()) {
+                existingConv.peerId
+            } else {
+                peerIdArg
+            }
+
+            val peer = chatRepository.getPeer(targetPeerId)
+            val canonicalPeerId = peer?.peerId ?: targetPeerId
             val conv = chatRepository.getOrCreateConversation(canonicalPeerId, peer?.displayName)
             val convId = conv.conversationId
 
             _uiState.value = _uiState.value.copy(
                 conversationId = convId,
-                peer = peer
+                peer = peer ?: chatRepository.getPeer(canonicalPeerId)
             )
 
             // Mark conversation as read
@@ -73,19 +80,21 @@ class ChatViewModel @Inject constructor(
         if (text.isEmpty()) return
 
         val convId = _uiState.value.conversationId
+        val peerId = _uiState.value.peer?.peerId ?: peerIdArg
         _uiState.value = _uiState.value.copy(inputText = "", isSending = true)
 
         viewModelScope.launch {
-            chatRepository.sendMessage(convId, peerIdArg, text)
+            chatRepository.sendMessage(convId, peerId, text)
             _uiState.value = _uiState.value.copy(isSending = false)
         }
     }
 
     fun sendImage(imageBytes: ByteArray) {
         val convId = _uiState.value.conversationId
+        val peerId = _uiState.value.peer?.peerId ?: peerIdArg
         if (convId.isBlank()) return
         viewModelScope.launch {
-            chatRepository.sendImage(convId, peerIdArg, imageBytes)
+            chatRepository.sendImage(convId, peerId, imageBytes)
         }
     }
 }

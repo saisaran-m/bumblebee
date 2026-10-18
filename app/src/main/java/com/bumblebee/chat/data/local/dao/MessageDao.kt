@@ -24,6 +24,9 @@ interface MessageDao {
     @Query("UPDATE messages SET status = :status WHERE messageId = :messageId")
     suspend fun updateStatus(messageId: String, status: String)
 
+    @Query("UPDATE messages SET conversationId = :newConversationId WHERE conversationId IN (:oldConversationIds)")
+    suspend fun migrateMessagesToConversation(oldConversationIds: List<String>, newConversationId: String)
+
     @Query("UPDATE messages SET isDeleted = 1 WHERE messageId = :messageId")
     suspend fun softDelete(messageId: String)
 

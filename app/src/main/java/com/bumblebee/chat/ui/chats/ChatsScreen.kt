@@ -186,9 +186,8 @@ fun ChatsScreen(
                     ConversationItem(
                         conversation = conversation,
                         onClick = {
-                            conversation.peerId?.let { peerId ->
-                                onNavigateToChat(peerId)
-                            }
+                            val targetId = conversation.peerId ?: conversation.conversationId
+                            onNavigateToChat(targetId)
                         }
                     )
                 }
