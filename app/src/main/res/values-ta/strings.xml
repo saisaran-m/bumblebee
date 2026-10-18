@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">பம்பிள்பீ</string>
+    <string name="tagline">இணையம் இன்றி அரட்டையடிக்கலாம். பக்கத்துத் தேனீக்களை அழையுங்கள்.</string>
+    <string name="welcome_hive">தேன்கூட்டிற்கு நல்வரவு!</string>
+    <string name="tab_chats">அரட்டைகள்</string>
+    <string name="tab_nearby">அருகில்</string>
+    <string name="tab_buzz">பஸ் (SOS)</string>
+    <string name="tab_settings">அமைப்புகள்</string>
+    <string name="honeycomb">அறுகோணக் கூடு</string>
+    <string name="join_hive">தேன்கூட்டில் இணையுங்கள்</string>
+</resources>

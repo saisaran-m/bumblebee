@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Wings -->
+    <path
+        android:fillColor="#E9DFFB"
+        android:strokeColor="#9B7EDE"
+        android:strokeWidth="1.5"
+        android:pathData="M52,48 C44,30 30,34 38,48 C42,54 48,52 52,50 Z" />
+    <path
+        android:fillColor="#E9DFFB"
+        android:strokeColor="#9B7EDE"
+        android:strokeWidth="1.5"
+        android:pathData="M56,48 C64,30 78,34 70,48 C66,54 60,52 56,50 Z" />
+
+    <!-- Bee Body (Honey Gold) -->
+    <path
+        android:fillColor="#F5C542"
+        android:strokeColor="#7C5CBF"
+        android:strokeWidth="2"
+        android:pathData="M54,42 C44,42 40,54 40,64 C40,74 46,82 54,82 C62,82 68,74 68,64 C68,54 64,42 54,42 Z" />
+
+    <!-- Bee Dark Lavender Stripes -->
+    <path
+        android:fillColor="#7C5CBF"
+        android:pathData="M41,54 C44,52 64,52 67,54 C66,58 64,60 44,60 C42,60 41,56 41,54 Z" />
+    <path
+        android:fillColor="#7C5CBF"
+        android:pathData="M42,66 C45,64 63,64 66,66 C64,70 62,72 46,72 C43,72 42,68 42,66 Z" />
+
+    <!-- Stinger -->
+    <path
+        android:fillColor="#7C5CBF"
+        android:pathData="M53,82 L55,82 L54,86 Z" />
+
+    <!-- Eyes -->
+    <path
+        android:fillColor="#2B2438"
+        android:pathData="M48,47 A2,2 0 1,1 48,47.01 Z" />
+    <path
+        android:fillColor="#2B2438"
+        android:pathData="M60,47 A2,2 0 1,1 60,47.01 Z" />
+
+    <!-- Antennae -->
+    <path
+        android:strokeColor="#7C5CBF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M50,42 C48,36 44,36 44,37" />
+    <path
+        android:strokeColor="#7C5CBF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M58,42 C60,36 64,36 64,37" />
+</vector>
