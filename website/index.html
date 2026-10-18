@@ -35,83 +35,22 @@
               cardBorder: '#1F212A',
               subtleText: '#94A3B8',
             }
-          },
-          animation: {
-            'radar-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'radar-ripple': 'ripple 3.5s linear infinite',
-            'float': 'float 5s ease-in-out infinite',
-          },
-          keyframes: {
-            ripple: {
-              '0%': { transform: 'scale(0.8)', opacity: '0.8' },
-              '100%': { transform: 'scale(2.2)', opacity: '0' },
-            },
-            float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-8px)' },
-            }
           }
         }
       }
     }
   </script>
 
+  <!-- External Modern Design System CSS -->
+  <link rel="stylesheet" href="style.css" />
+
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <style>
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #070809;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1F212A;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #9B7EDE;
-    }
-
-    /* Radar Background Ripples */
-    .radar-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(245, 197, 66, 0.08);
-      pointer-events: none;
-    }
-
-    .glow-honey {
-      box-shadow: 0 0 40px -5px rgba(245, 197, 66, 0.28);
-    }
-
-    .glow-lavender {
-      box-shadow: 0 0 40px -5px rgba(155, 126, 222, 0.28);
-    }
-
-    /* Modern Card Sheen */
-    .card-sheen {
-      position: relative;
-      overflow: hidden;
-    }
-    .card-sheen::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%; width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-      transition: 0.5s;
-    }
-    .card-sheen:hover::before {
-      left: 100%;
-    }
-  </style>
 </head>
-<body class="bg-[#070809] text-white font-sans antialiased selection:bg-brand-honey selection:text-black min-h-screen">
+<body class="bg-[#070809] text-white font-sans antialiased selection:bg-brand-honey selection:text-black min-h-screen bg-mesh-grid relative">
 
   <!-- ==================== TOP NAVIGATION ==================== -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-[#070809]/85 backdrop-blur-md border-b border-[#1C1D24]">
+  <header class="fixed top-0 left-0 right-0 z-50 bg-[#070809]/90 backdrop-blur-md border-b border-[#1C1D24]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
       <!-- Logo -->
@@ -127,7 +66,7 @@
         </div>
       </a>
 
-      <!-- Desktop Links -->
+      <!-- Desktop Navigation Links -->
       <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-brand-subtleText">
         <a href="#simulator" class="hover:text-white transition-colors">Live Sim</a>
         <a href="#features" class="hover:text-white transition-colors">Features</a>
@@ -147,9 +86,34 @@
         </a>
 
         <a href="https://github.com/saisaran-m/bumblebee/releases/download/v1.0.0/bumblebee.apk"
-           class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-brand-honey text-black hover:bg-brand-honeyDark active:scale-95 transition-all shadow-sm">
+           class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-lg btn-honey shadow-sm">
           <i data-lucide="download" class="w-4 h-4"></i>
           <span>Download</span>
+        </a>
+
+        <!-- Mobile Hamburger Button -->
+        <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg bg-[#14151B] border border-[#262833] text-zinc-300 hover:text-white focus:outline-none">
+          <i data-lucide="menu" id="menuIcon" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Slide-Down Menu -->
+    <div id="mobileMenu" class="hidden md:hidden px-4 pt-2 pb-5 border-b border-[#1C1D24] bg-[#070809]/95 backdrop-blur-xl space-y-3">
+      <a href="#simulator" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-zinc-300 hover:text-white py-1">Live Simulator</a>
+      <a href="#features" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-zinc-300 hover:text-white py-1">Features</a>
+      <a href="#screenshots" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-zinc-300 hover:text-white py-1">Screenshots</a>
+      <a href="#architecture" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-zinc-300 hover:text-white py-1">Architecture</a>
+      <a href="#setup" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-zinc-300 hover:text-white py-1">Setup</a>
+      <a href="#about" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-zinc-300 hover:text-white py-1">About</a>
+      <a href="#faq" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-zinc-300 hover:text-white py-1">FAQ</a>
+      <div class="pt-2 border-t border-[#1C1D24] flex items-center justify-between">
+        <a href="https://github.com/saisaran-m/bumblebee" target="_blank" class="text-xs text-brand-subtleText flex items-center gap-1.5">
+          <i data-lucide="github" class="w-3.5 h-3.5"></i>
+          <span>GitHub Repo</span>
+        </a>
+        <a href="https://github.com/saisaran-m/bumblebee/releases" target="_blank" class="text-xs text-brand-honey font-bold">
+          All Releases →
         </a>
       </div>
     </div>
@@ -158,23 +122,22 @@
   <!-- ==================== HERO SECTION ==================== -->
   <section class="relative pt-32 pb-20 sm:pt-40 sm:pb-28 overflow-hidden">
     
-    <!-- Radar Ripple Background Animation -->
+    <!-- Concentric Radar Pulse Rings -->
     <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
-      <div class="radar-ring w-[320px] h-[320px] animate-radar-slow"></div>
-      <div class="radar-ring w-[540px] h-[540px]"></div>
-      <div class="radar-ring w-[780px] h-[780px]"></div>
-      <div class="radar-ring w-[1020px] h-[1020px]"></div>
+      <div class="radar-circle w-[320px] h-[320px]"></div>
+      <div class="radar-circle w-[560px] h-[560px]" style="animation-delay: -2s;"></div>
+      <div class="radar-circle w-[820px] h-[820px]" style="animation-delay: -4s;"></div>
     </div>
 
-    <!-- Radial Glow Spotlights -->
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-brand-honey/10 blur-[130px] rounded-full pointer-events-none"></div>
-    <div class="absolute top-1/3 left-1/3 w-[400px] h-[300px] bg-brand-lavender/10 blur-[120px] rounded-full pointer-events-none"></div>
+    <!-- Ambient Glow Spotlights -->
+    <div class="ambient-orb ambient-honey w-[600px] h-[350px] top-1/4 left-1/2 -translate-x-1/2"></div>
+    <div class="ambient-orb ambient-lavender w-[450px] h-[300px] top-1/3 left-1/4"></div>
 
-    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
+    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left z-10">
       
       <!-- Air-Gap Badge -->
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121319] border border-[#242633] text-xs font-medium text-zinc-300 mb-8 animate-float">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121319] border border-[#242633] text-xs font-medium text-zinc-300 mb-8 shadow-sm">
+        <span class="live-beacon"></span>
         <span class="text-zinc-200 font-semibold">100% Offline P2P Mesh</span>
         <span class="text-zinc-500">•</span>
         <span class="text-brand-subtleText">Zero SIM / Zero Cloud</span>
@@ -183,7 +146,7 @@
       <!-- Main Headline -->
       <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.08] text-white">
         Chat with neighbors.<br />
-        <span class="text-brand-honey">No internet.</span>
+        <span class="text-gradient-honey">No internet.</span>
       </h1>
 
       <!-- Description -->
@@ -195,28 +158,28 @@
       <div class="mt-10 flex flex-wrap items-center gap-4 justify-center sm:justify-start">
         <!-- Download APK Button -->
         <a href="https://github.com/saisaran-m/bumblebee/releases/download/v1.0.0/bumblebee.apk"
-           class="flex items-center gap-3 px-6 py-3.5 rounded-xl bg-brand-honey text-black font-extrabold text-base hover:bg-brand-honeyDark active:scale-95 transition-all glow-honey">
+           class="flex items-center gap-3 px-6 py-3.5 rounded-xl btn-honey text-base">
           <i data-lucide="download" class="w-5 h-5 stroke-[2.5]"></i>
           <span>Download APK</span>
         </a>
 
         <!-- Setup Guide Button -->
         <a href="#setup" 
-           class="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#12131A] border border-[#272936] text-white font-semibold text-base hover:border-brand-lavender hover:bg-[#181A22] active:scale-95 transition-all">
+           class="flex items-center gap-2 px-6 py-3.5 rounded-xl btn-dark text-base hover:border-brand-lavender">
           <span>Setup Guide</span>
           <i data-lucide="arrow-right" class="w-4 h-4 text-brand-lavender"></i>
         </a>
 
         <!-- Interactive Simulator Button -->
         <a href="#simulator" 
-           class="flex items-center gap-2 px-5 py-3.5 rounded-xl bg-[#12131A] border border-[#272936] text-zinc-300 font-semibold text-sm hover:border-zinc-500 transition-all">
+           class="flex items-center gap-2 px-5 py-3.5 rounded-xl btn-dark text-sm">
           <i data-lucide="radio" class="w-4 h-4 text-emerald-400"></i>
           <span>Live Radio Sim</span>
         </a>
 
         <!-- Star on GitHub -->
         <a href="https://github.com/saisaran-m/bumblebee" target="_blank" rel="noopener noreferrer"
-           class="flex items-center gap-2 px-5 py-3.5 rounded-xl bg-[#12131A] border border-[#272936] text-zinc-300 font-semibold text-sm hover:border-zinc-500 transition-all">
+           class="flex items-center gap-2 px-5 py-3.5 rounded-xl btn-dark text-sm">
           <i data-lucide="star" class="w-4 h-4 text-brand-honey fill-brand-honey"></i>
           <span>Star on GitHub</span>
         </a>
@@ -245,7 +208,7 @@
   </section>
 
   <!-- ==================== LIVE INTERACTIVE P2P SIMULATOR ==================== -->
-  <section id="simulator" class="py-20 border-t border-[#1C1D24] bg-[#0A0B0F]/70 relative">
+  <section id="simulator" class="py-20 border-t border-[#1C1D24] bg-[#0A0B0F]/80 relative">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <div class="text-center max-w-3xl mx-auto mb-12">
@@ -262,17 +225,24 @@
       </div>
 
       <!-- Simulator Board -->
-      <div class="bg-[#0E1016] border border-[#20222D] rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden card-sheen">
+      <div class="bento-card p-6 sm:p-8 shadow-2xl relative overflow-hidden">
         
         <!-- Controls Bar -->
         <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#1E202B]">
           <div class="flex items-center gap-3">
-            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="live-beacon"></span>
             <span class="text-sm font-semibold text-white">Carrier: <span class="font-mono text-brand-honey">Wi-Fi Direct (Direct P2P Link)</span></span>
           </div>
           
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-mono text-brand-subtleText">Air-Gap Status:</span>
+          <div class="flex items-center gap-4">
+            <!-- Audio Sound FX Toggle -->
+            <button id="toggleSoundBtn" onclick="toggleSoundFx()" 
+                    class="px-2.5 py-1 rounded-md text-xs font-semibold bg-[#181A25] hover:bg-[#222533] text-zinc-300 border border-[#2B2E40] flex items-center gap-1.5 transition-colors">
+              <i data-lucide="volume-2" id="soundIcon" class="w-3.5 h-3.5 text-brand-honey"></i>
+              <span id="soundText">Sound: ON</span>
+            </button>
+
+            <!-- Airplane Mode Switch -->
             <button id="toggleAirplane" onclick="toggleAirplaneMode()" 
                     class="px-3 py-1 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all">
               Airplane Mode: ON (Air-Gapped)
@@ -280,8 +250,11 @@
           </div>
         </div>
 
+        <!-- Animated Radio Wire Beam (Activates during packet flight) -->
+        <div id="simRadioBeam" class="hidden my-4 radio-beam rounded-full opacity-90"></div>
+
         <!-- Two Virtual Phones -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
           
           <!-- Phone A -->
           <div class="bg-[#13151D] border border-[#242634] rounded-2xl p-5 flex flex-col justify-between">
@@ -320,7 +293,7 @@
                 <i data-lucide="mic" class="w-4 h-4"></i>
               </button>
               <button onclick="sendSimMessage()" 
-                      class="px-4 py-2.5 bg-brand-honey text-black font-bold text-xs rounded-xl hover:bg-brand-honeyDark active:scale-95 transition-all">
+                      class="px-4 py-2.5 btn-honey text-xs rounded-xl">
                 Send
               </button>
             </div>
@@ -357,7 +330,7 @@
             <div class="bg-[#090A0E] border border-[#1E202B] rounded-xl p-3 text-[11px] font-mono text-brand-subtleText">
               <div class="flex justify-between items-center text-zinc-400 mb-1">
                 <span>Packet Wire Trace:</span>
-                <span id="packetStatus" class="text-emerald-400">ACK_DELIVERED (0ms latency)</span>
+                <span id="packetStatus" class="text-emerald-400 font-bold">ACK_DELIVERED (0ms latency)</span>
               </div>
               <div id="packetTrace" class="truncate text-zinc-500">
                 {"type":"MESSAGE","senderId":"BEE-8821","chunks":1,"payloadSize":"48B"}
@@ -400,10 +373,10 @@
       </div>
 
       <!-- Interactive Featured Phone Showcase -->
-      <div class="mb-16 max-w-4xl mx-auto bg-[#0E1016] border border-[#20222F] rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col md:flex-row items-center gap-10">
-        <!-- Phone Mockup Container -->
-        <div class="w-[260px] sm:w-[280px] shrink-0 rounded-[38px] p-2.5 bg-[#1C1E2A] border-4 border-[#2D3042] shadow-2xl">
-          <div class="w-full aspect-[9/19] rounded-[30px] overflow-hidden bg-black border border-[#252838] relative">
+      <div class="mb-16 max-w-4xl mx-auto bento-card p-6 sm:p-10 shadow-2xl flex flex-col md:flex-row items-center gap-10">
+        <!-- Titanium Phone Mockup -->
+        <div class="w-[260px] sm:w-[280px] shrink-0 phone-mockup-frame">
+          <div class="w-full aspect-[9/19] rounded-[32px] overflow-hidden bg-black border border-[#252838] relative">
             <img id="featuredScreenImg" src="screenshots/chats_screen.png" alt="Featured App Screen" class="w-full h-full object-cover transition-opacity duration-300" />
           </div>
         </div>
@@ -437,7 +410,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <!-- Screen 1: Chats Screen -->
-        <div onclick="switchScreenTab(0)" class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-brand-honey/50 transition-all cursor-pointer group">
+        <div onclick="switchScreenTab(0)" class="bento-card p-4 flex flex-col cursor-pointer group">
           <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
             <img src="screenshots/chats_screen.png" alt="Chats Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           </div>
@@ -453,7 +426,7 @@
         </div>
 
         <!-- Screen 2: Direct Chat -->
-        <div onclick="switchScreenTab(1)" class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-brand-lavender/50 transition-all cursor-pointer group">
+        <div onclick="switchScreenTab(1)" class="bento-card p-4 flex flex-col cursor-pointer group">
           <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
             <img src="screenshots/chat_screen.png" alt="Direct Chat Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           </div>
@@ -469,7 +442,7 @@
         </div>
 
         <!-- Screen 3: Emergency SOS -->
-        <div onclick="switchScreenTab(2)" class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-rose-500/50 transition-all cursor-pointer group">
+        <div onclick="switchScreenTab(2)" class="bento-card p-4 flex flex-col cursor-pointer group">
           <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
             <img src="screenshots/buzz_sos_screen.png" alt="Emergency SOS Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           </div>
@@ -485,7 +458,7 @@
         </div>
 
         <!-- Screen 4: Settings -->
-        <div onclick="switchScreenTab(3)" class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-4 flex flex-col hover:border-emerald-400/50 transition-all cursor-pointer group">
+        <div onclick="switchScreenTab(3)" class="bento-card p-4 flex flex-col cursor-pointer group">
           <div class="overflow-hidden rounded-2xl bg-black border border-[#252838] aspect-[9/19] flex items-center justify-center">
             <img src="screenshots/settings_screen.png" alt="Settings Screen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           </div>
@@ -517,11 +490,11 @@
         </p>
       </div>
 
-      <!-- Bento Grid -->
+      <!-- Bento Grid with Hover Lighting -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         <!-- Feature 1 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-honey/40 transition-colors card-sheen">
+        <div class="bento-card p-8 light-sweep">
           <div class="w-12 h-12 rounded-2xl bg-brand-honey/10 border border-brand-honey/20 flex items-center justify-center text-brand-honey mb-6">
             <i data-lucide="wifi-off" class="w-6 h-6"></i>
           </div>
@@ -532,7 +505,7 @@
         </div>
 
         <!-- Feature 2 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-lavender/40 transition-colors card-sheen">
+        <div class="bento-card p-8 light-sweep">
           <div class="w-12 h-12 rounded-2xl bg-brand-lavender/10 border border-brand-lavender/20 flex items-center justify-center text-brand-lavender mb-6">
             <i data-lucide="mic" class="w-6 h-6"></i>
           </div>
@@ -543,7 +516,7 @@
         </div>
 
         <!-- Feature 3 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-honey/40 transition-colors card-sheen">
+        <div class="bento-card p-8 light-sweep">
           <div class="w-12 h-12 rounded-2xl bg-brand-honey/10 border border-brand-honey/20 flex items-center justify-center text-brand-honey mb-6">
             <i data-lucide="image" class="w-6 h-6"></i>
           </div>
@@ -554,7 +527,7 @@
         </div>
 
         <!-- Feature 4 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-emerald-400/40 transition-colors card-sheen">
+        <div class="bento-card p-8 light-sweep">
           <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6">
             <i data-lucide="key" class="w-6 h-6"></i>
           </div>
@@ -565,7 +538,7 @@
         </div>
 
         <!-- Feature 5 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-rose-500/40 transition-colors card-sheen">
+        <div class="bento-card p-8 light-sweep">
           <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 mb-6">
             <i data-lucide="alert-octagon" class="w-6 h-6"></i>
           </div>
@@ -576,7 +549,7 @@
         </div>
 
         <!-- Feature 6 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-3xl p-8 hover:border-brand-lavender/40 transition-colors card-sheen">
+        <div class="bento-card p-8 light-sweep">
           <div class="w-12 h-12 rounded-2xl bg-brand-lavender/10 border border-brand-lavender/20 flex items-center justify-center text-brand-lavender mb-6">
             <i data-lucide="lock" class="w-6 h-6"></i>
           </div>
@@ -606,7 +579,7 @@
       <div class="space-y-6">
         
         <!-- Step 1 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <div class="bento-card p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
           <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg shrink-0">
             01
           </div>
@@ -622,7 +595,7 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <div class="bento-card p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
           <div class="w-12 h-12 rounded-xl bg-brand-honey/10 border border-brand-honey/20 text-brand-honey flex items-center justify-center font-bold text-lg shrink-0">
             02
           </div>
@@ -638,7 +611,7 @@
         </div>
 
         <!-- Step 3 -->
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <div class="bento-card p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
           <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg shrink-0">
             03
           </div>
@@ -654,6 +627,19 @@
         </div>
 
       </div>
+
+      <!-- Quick Git Clone Box -->
+      <div class="mt-12 bg-[#0E1016] border border-[#222533] rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs">
+        <div class="flex items-center gap-2 text-zinc-400 truncate">
+          <span class="text-brand-honey">$</span>
+          <span id="cloneCmd" class="truncate">git clone https://github.com/saisaran-m/bumblebee.git</span>
+        </div>
+        <button onclick="copyCloneCommand(this)" class="btn-dark px-3.5 py-2 text-xs flex items-center gap-1.5 shrink-0">
+          <i data-lucide="copy" class="w-3.5 h-3.5 text-brand-honey"></i>
+          <span>Copy</span>
+        </button>
+      </div>
+
     </div>
   </section>
 
@@ -672,7 +658,7 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+        <div class="bento-card p-6">
           <div class="w-9 h-9 rounded-lg bg-brand-honey/10 border border-brand-honey/20 text-brand-honey flex items-center justify-center font-bold text-sm mb-4">
             1
           </div>
@@ -682,7 +668,7 @@
           </p>
         </div>
 
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+        <div class="bento-card p-6">
           <div class="w-9 h-9 rounded-lg bg-brand-lavender/10 border border-brand-lavender/20 text-brand-lavender flex items-center justify-center font-bold text-sm mb-4">
             2
           </div>
@@ -692,7 +678,7 @@
           </p>
         </div>
 
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+        <div class="bento-card p-6">
           <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm mb-4">
             3
           </div>
@@ -702,7 +688,7 @@
           </p>
         </div>
 
-        <div class="bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6">
+        <div class="bento-card p-6">
           <div class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm mb-4">
             4
           </div>
@@ -717,7 +703,7 @@
       <!-- Centered Download CTA -->
       <div class="mt-12 text-center">
         <a href="https://github.com/saisaran-m/bumblebee/releases/download/v1.0.0/bumblebee.apk"
-           class="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-brand-honey text-black font-extrabold text-base hover:bg-brand-honeyDark active:scale-95 transition-all glow-honey">
+           class="inline-flex items-center gap-3 px-8 py-4 btn-honey text-base">
           <i data-lucide="download" class="w-5 h-5 stroke-[2.5]"></i>
           <span>Download bumblebee.apk (v1.0.0)</span>
         </a>
@@ -729,8 +715,8 @@
   <!-- ==================== ABOUT SECTION (MISSION & STORY) ==================== -->
   <section id="about" class="py-24 border-t border-[#1C1D24] relative overflow-hidden">
     
-    <!-- Background subtle glow -->
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-brand-honey/5 blur-[150px] pointer-events-none"></div>
+    <!-- Ambient light spotlight -->
+    <div class="ambient-orb ambient-honey w-[700px] h-[350px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
 
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       
@@ -751,7 +737,7 @@
       <!-- 3 Core Philosophy Pillars -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
         
-        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-8 card-sheen">
+        <div class="bento-card p-8 light-sweep">
           <div class="w-12 h-12 rounded-2xl bg-brand-honey/10 border border-brand-honey/20 flex items-center justify-center text-brand-honey mb-6">
             <i data-lucide="radio-tower" class="w-6 h-6"></i>
           </div>
@@ -761,7 +747,7 @@
           </p>
         </div>
 
-        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-8 card-sheen">
+        <div class="bento-card p-8 light-sweep">
           <div class="w-12 h-12 rounded-2xl bg-brand-lavender/10 border border-brand-lavender/20 flex items-center justify-center text-brand-lavender mb-6">
             <i data-lucide="eye-off" class="w-6 h-6"></i>
           </div>
@@ -771,7 +757,7 @@
           </p>
         </div>
 
-        <div class="bg-[#0E1016] border border-[#1F212D] rounded-3xl p-8 card-sheen">
+        <div class="bento-card p-8 light-sweep">
           <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6">
             <i data-lucide="heart" class="w-6 h-6"></i>
           </div>
@@ -784,7 +770,7 @@
       </div>
 
       <!-- Startup Defensibility Matrix (Comparison Table) -->
-      <div class="bg-[#0E1016] border border-[#20222F] rounded-3xl p-6 sm:p-8 mb-16 overflow-x-auto shadow-2xl">
+      <div class="bento-card p-6 sm:p-8 mb-16 overflow-x-auto shadow-2xl">
         <div class="mb-6">
           <h3 class="text-xl font-bold text-white flex items-center gap-2">
             <i data-lucide="layers" class="w-5 h-5 text-brand-honey"></i>
@@ -902,7 +888,7 @@
       <div class="space-y-4">
         
         <!-- Q1 -->
-        <details class="group bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 open:border-brand-honey/30 transition-colors">
+        <details class="group bento-card p-6 open:border-brand-honey/40 transition-colors">
           <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-white text-base">
             <span>Does Bumblebee really work with zero internet?</span>
             <i data-lucide="chevron-down" class="w-5 h-5 text-brand-subtleText group-open:rotate-180 transition-transform"></i>
@@ -913,7 +899,7 @@
         </details>
 
         <!-- Q2 -->
-        <details class="group bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 open:border-brand-honey/30 transition-colors">
+        <details class="group bento-card p-6 open:border-brand-honey/40 transition-colors">
           <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-white text-base">
             <span>What is the communication range?</span>
             <i data-lucide="chevron-down" class="w-5 h-5 text-brand-subtleText group-open:rotate-180 transition-transform"></i>
@@ -924,7 +910,7 @@
         </details>
 
         <!-- Q3 -->
-        <details class="group bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 open:border-brand-honey/30 transition-colors">
+        <details class="group bento-card p-6 open:border-brand-honey/40 transition-colors">
           <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-white text-base">
             <span>Why does it need Location permission on Android?</span>
             <i data-lucide="chevron-down" class="w-5 h-5 text-brand-subtleText group-open:rotate-180 transition-transform"></i>
@@ -935,7 +921,7 @@
         </details>
 
         <!-- Q4 -->
-        <details class="group bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 open:border-brand-honey/30 transition-colors">
+        <details class="group bento-card p-6 open:border-brand-honey/40 transition-colors">
           <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-white text-base">
             <span>How does Bumblebee send high-resolution photos offline?</span>
             <i data-lucide="chevron-down" class="w-5 h-5 text-brand-subtleText group-open:rotate-180 transition-transform"></i>
@@ -946,7 +932,7 @@
         </details>
 
         <!-- Q5 -->
-        <details class="group bg-[#0E1016] border border-[#1E202B] rounded-2xl p-6 open:border-brand-honey/30 transition-colors">
+        <details class="group bento-card p-6 open:border-brand-honey/40 transition-colors">
           <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-white text-base">
             <span>Is it open-source?</span>
             <i data-lucide="chevron-down" class="w-5 h-5 text-brand-subtleText group-open:rotate-180 transition-transform"></i>
@@ -977,13 +963,13 @@
 
       <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
         <a href="https://github.com/saisaran-m/bumblebee/releases/download/v1.0.0/bumblebee.apk"
-           class="flex items-center gap-3 px-8 py-4 rounded-xl bg-brand-honey text-black font-extrabold text-base hover:bg-brand-honeyDark active:scale-95 transition-all glow-honey">
+           class="flex items-center gap-3 px-8 py-4 btn-honey text-base">
           <i data-lucide="download" class="w-5 h-5 stroke-[2.5]"></i>
           <span>Download bumblebee.apk</span>
         </a>
 
         <a href="https://github.com/saisaran-m/bumblebee" target="_blank" rel="noopener noreferrer"
-           class="flex items-center gap-2 px-7 py-4 rounded-xl bg-[#141620] border border-[#272A38] text-white font-semibold text-base hover:border-zinc-400 active:scale-95 transition-all">
+           class="flex items-center gap-2 px-7 py-4 btn-dark text-base">
           <i data-lucide="github" class="w-5 h-5"></i>
           <span>View on GitHub</span>
         </a>
@@ -1013,13 +999,22 @@
     </div>
   </footer>
 
+  <!-- Floating Back-to-Top Button -->
+  <button id="backToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+          class="fixed bottom-6 right-6 z-40 p-3 rounded-full bg-[#12141D] border border-[#262838] text-brand-honey hover:bg-[#1A1D2A] shadow-xl opacity-0 pointer-events-none transition-all">
+    <i data-lucide="arrow-up" class="w-5 h-5"></i>
+  </button>
+
   <!-- ==================== INTERACTIVE SCRIPTS ==================== -->
   <script>
     lucide.createIcons();
 
     // Sound FX synthesizer using Web Audio API
     let audioCtx = null;
+    let isSoundMuted = false;
+
     function playBeep(freq = 600, type = 'sine', duration = 0.08) {
+      if (isSoundMuted) return;
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -1027,13 +1022,60 @@
         const gain = audioCtx.createGain();
         osc.type = type;
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
         osc.stop(audioCtx.currentTime + duration);
       } catch (e) {}
+    }
+
+    function toggleSoundFx() {
+      isSoundMuted = !isSoundMuted;
+      const soundText = document.getElementById('soundText');
+      const soundIcon = document.getElementById('soundIcon');
+      if (isSoundMuted) {
+        soundText.textContent = 'Sound: OFF';
+        soundIcon.className = 'w-3.5 h-3.5 text-zinc-500';
+      } else {
+        soundText.textContent = 'Sound: ON';
+        soundIcon.className = 'w-3.5 h-3.5 text-brand-honey';
+        playBeep(700, 'sine', 0.08);
+      }
+    }
+
+    // Mobile Hamburger Menu
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    // Scroll Listener for Back-To-Top
+    window.addEventListener('scroll', () => {
+      const btt = document.getElementById('backToTopBtn');
+      if (window.scrollY > 400) {
+        btt.classList.remove('opacity-0', 'pointer-events-none');
+        btt.classList.add('opacity-100');
+      } else {
+        btt.classList.add('opacity-0', 'pointer-events-none');
+        btt.classList.remove('opacity-100');
+      }
+    });
+
+    // 1-Click Copy Command
+    function copyCloneCommand(btn) {
+      const text = "git clone https://github.com/saisaran-m/bumblebee.git";
+      navigator.clipboard.writeText(text).then(() => {
+        playBeep(900, 'sine', 0.06);
+        const original = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i><span class="text-emerald-400 font-bold">Copied!</span>`;
+        lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = original;
+          lucide.createIcons();
+        }, 2000);
+      });
     }
 
     // Interactive Screen Switcher State
@@ -1075,7 +1117,6 @@
     function switchScreenTab(index) {
       playBeep(450, 'sine', 0.05);
 
-      // Update Tab Styles
       for (let i = 0; i < 4; i++) {
         const tab = document.getElementById(`tab${i}`);
         if (i === index) {
@@ -1085,7 +1126,6 @@
         }
       }
 
-      // Update Featured Content
       const data = screenData[index];
       const imgElem = document.getElementById('featuredScreenImg');
       imgElem.style.opacity = '0';
@@ -1128,7 +1168,7 @@
 
       // Append to A
       const msgDivA = document.createElement('div');
-      msgDivA.className = 'flex justify-end';
+      msgDivA.className = 'flex justify-end sim-msg-in';
       msgDivA.innerHTML = `
         <div class="bg-brand-lavenderDark/40 text-purple-100 rounded-xl px-3 py-2 max-w-[80%] border border-brand-lavender/30">
           ${escapeHtml(text)}
@@ -1136,6 +1176,10 @@
       `;
       phoneA.appendChild(msgDivA);
       phoneA.scrollTop = phoneA.scrollHeight;
+
+      // Pulse the Radio Beam
+      const beam = document.getElementById('simRadioBeam');
+      beam.classList.remove('hidden');
 
       // Update Radio Packet Trace
       const packetTrace = document.getElementById('packetTrace');
@@ -1150,13 +1194,15 @@
         content: text
       });
       packetStatus.textContent = "TRANSMITTING RADIO PACKET...";
-      packetStatus.className = "text-amber-400";
+      packetStatus.className = "text-amber-400 font-bold";
 
-      // Receive on B after 150ms simulated radio flight
+      // Receive on B after 160ms simulated radio flight
       setTimeout(() => {
         playBeep(1100, 'sine', 0.08);
+        beam.classList.add('hidden');
+
         const msgDivB = document.createElement('div');
-        msgDivB.className = 'flex justify-start';
+        msgDivB.className = 'flex justify-start sim-msg-in';
         msgDivB.innerHTML = `
           <div class="bg-[#1C1E29] text-zinc-200 rounded-xl px-3 py-2 max-w-[80%] border border-[#282B3B]">
             ${escapeHtml(text)}
@@ -1166,8 +1212,8 @@
         phoneB.scrollTop = phoneB.scrollHeight;
 
         packetStatus.textContent = "ACK_DELIVERED (0.1ms radio latency)";
-        packetStatus.className = "text-emerald-400";
-      }, 160);
+        packetStatus.className = "text-emerald-400 font-bold";
+      }, 180);
     }
 
     function sendSimVoice() {
@@ -1176,7 +1222,7 @@
       const phoneB = document.getElementById('phoneBMessages');
 
       const voiceDivA = document.createElement('div');
-      voiceDivA.className = 'flex justify-end';
+      voiceDivA.className = 'flex justify-end sim-msg-in';
       voiceDivA.innerHTML = `
         <div class="bg-brand-lavenderDark/40 text-purple-100 rounded-xl px-3 py-2 border border-brand-lavender/30 flex items-center gap-2">
           <span>🎙️</span>
@@ -1185,6 +1231,9 @@
       `;
       phoneA.appendChild(voiceDivA);
       phoneA.scrollTop = phoneA.scrollHeight;
+
+      const beam = document.getElementById('simRadioBeam');
+      beam.classList.remove('hidden');
 
       const packetTrace = document.getElementById('packetTrace');
       const packetStatus = document.getElementById('packetStatus');
@@ -1196,12 +1245,14 @@
         duration: "3000ms"
       });
       packetStatus.textContent = "TRANSMITTING AUDIO CHUNK...";
-      packetStatus.className = "text-amber-400";
+      packetStatus.className = "text-amber-400 font-bold";
 
       setTimeout(() => {
         playBeep(1200, 'sine', 0.1);
+        beam.classList.add('hidden');
+
         const voiceDivB = document.createElement('div');
-        voiceDivB.className = 'flex justify-start';
+        voiceDivB.className = 'flex justify-start sim-msg-in';
         voiceDivB.innerHTML = `
           <div class="bg-[#1C1E29] text-zinc-200 rounded-xl px-3 py-2 border border-[#282B3B] flex items-center gap-2">
             <span>🎙️</span>
@@ -1211,8 +1262,8 @@
         phoneB.appendChild(voiceDivB);
         phoneB.scrollTop = phoneB.scrollHeight;
         packetStatus.textContent = "ACK_DELIVERED (0.1ms radio latency)";
-        packetStatus.className = "text-emerald-400";
-      }, 220);
+        packetStatus.className = "text-emerald-400 font-bold";
+      }, 240);
     }
 
     function escapeHtml(string) {
