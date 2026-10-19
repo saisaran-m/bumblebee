@@ -109,23 +109,14 @@ fun OnboardingScreen(
                 .padding(horizontal = 24.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // High-Tech Vector Logo
-            com.bumblebee.chat.ui.components.BumblebeeLogo(
-                size = 58.dp,
-                showPulseRings = true
-            )
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            // Greeting Header
+            // Bee Greeting Header
             Text(
-                text = "Welcome to Bumblebee",
+                text = "Welcome to the Hive!",
                 style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Black,
-                    color = BumblebeeTextPrimary,
-                    fontSize = 26.sp
+                    fontWeight = FontWeight.Bold,
+                    color = BumblebeeTextPrimary
                 ),
                 textAlign = TextAlign.Center
             )
@@ -133,11 +124,10 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "100% offline peer-to-peer radio messaging.\nChoose your display name and avatar.",
+                text = "No phone number, no email, no cloud.\nChoose your display name and avatar.",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = BumblebeeTextSecondary,
-                    lineHeight = 20.sp,
-                    fontSize = 13.sp
+                    lineHeight = 20.sp
                 ),
                 textAlign = TextAlign.Center
             )

@@ -4,26 +4,11 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Deep Obsidian / Dark Slate Background -->
     <path
-        android:fillColor="#0D0E15"
+        android:fillColor="#FAF7FF"
         android:pathData="M0,0h108v108h-108z" />
-
-    <!-- Ambient Honey Radial Glow -->
     <path
-        android:fillColor="#F5C542"
-        android:fillAlpha="0.10"
-        android:pathData="M54,14 A40,40 0 1,1 54,94 A40,40 0 1,1 54,14 Z" />
-
-    <!-- Subtle Hexagonal Geometry Watermark -->
-    <path
-        android:strokeColor="#FFFFFF"
-        android:strokeAlpha="0.06"
-        android:strokeWidth="1.2"
-        android:pathData="M54,18 L86,36 L86,72 L54,90 L22,72 L22,36 Z" />
-    <path
-        android:strokeColor="#F5C542"
-        android:strokeAlpha="0.12"
-        android:strokeWidth="1"
-        android:pathData="M54,26 L78,40 L78,68 L54,82 L30,68 L30,40 Z" />
+        android:fillColor="#9B7EDE"
+        android:fillAlpha="0.15"
+        android:pathData="M54,16 L88,36 L88,76 L54,96 L20,76 L20,36 Z" />
 </vector>

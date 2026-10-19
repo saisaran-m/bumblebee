@@ -4,109 +4,55 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- Outer Hexagonal Badge -->
+    <!-- Wings -->
     <path
-        android:strokeColor="#F5C542"
-        android:strokeWidth="2.5"
-        android:fillColor="#151722"
-        android:pathData="M54,28 L76,40.5 L76,67.5 L54,80 L32,67.5 L32,40.5 Z" />
-
-    <!-- Radio Pulse Echo Arc Left -->
-    <path
-        android:strokeColor="#F5C542"
-        android:strokeAlpha="0.35"
+        android:fillColor="#E9DFFB"
+        android:strokeColor="#9B7EDE"
         android:strokeWidth="1.5"
-        android:strokeLineCap="round"
-        android:pathData="M27,45 C23,50 23,58 27,63" />
-
-    <!-- Radio Pulse Echo Arc Right -->
+        android:pathData="M52,48 C44,30 30,34 38,48 C42,54 48,52 52,50 Z" />
     <path
-        android:strokeColor="#F5C542"
-        android:strokeAlpha="0.35"
+        android:fillColor="#E9DFFB"
+        android:strokeColor="#9B7EDE"
         android:strokeWidth="1.5"
-        android:strokeLineCap="round"
-        android:pathData="M81,45 C85,50 85,58 81,63" />
+        android:pathData="M56,48 C64,30 78,34 70,48 C66,54 60,52 56,50 Z" />
 
-    <!-- Left Wing (Holographic Golden Tint) -->
+    <!-- Bee Body (Honey Gold) -->
     <path
         android:fillColor="#F5C542"
-        android:fillAlpha="0.85"
-        android:strokeColor="#FFE885"
-        android:strokeWidth="1"
-        android:pathData="M48,51 C38,40 34,44 38,53 C41,60 46,56 48,53 Z" />
+        android:strokeColor="#7C5CBF"
+        android:strokeWidth="2"
+        android:pathData="M54,42 C44,42 40,54 40,64 C40,74 46,82 54,82 C62,82 68,74 68,64 C68,54 64,42 54,42 Z" />
 
-    <!-- Right Wing (Holographic Golden Tint) -->
+    <!-- Bee Dark Lavender Stripes -->
     <path
-        android:fillColor="#F5C542"
-        android:fillAlpha="0.85"
-        android:strokeColor="#FFE885"
-        android:strokeWidth="1"
-        android:pathData="M60,51 C70,40 74,44 70,53 C67,60 62,56 60,53 Z" />
+        android:fillColor="#7C5CBF"
+        android:pathData="M41,54 C44,52 64,52 67,54 C66,58 64,60 44,60 C42,60 41,56 41,54 Z" />
+    <path
+        android:fillColor="#7C5CBF"
+        android:pathData="M42,66 C45,64 63,64 66,66 C64,70 62,72 46,72 C43,72 42,68 42,66 Z" />
 
-    <!-- Bee Antennae with Signal Transmitter Tips -->
+    <!-- Stinger -->
     <path
-        android:strokeColor="#F5C542"
-        android:strokeWidth="1.8"
-        android:strokeLineCap="round"
-        android:pathData="M50,44 C48,39 44,39 42,41" />
-    <path
-        android:strokeColor="#F5C542"
-        android:strokeWidth="1.8"
-        android:strokeLineCap="round"
-        android:pathData="M58,44 C60,39 64,39 66,41" />
+        android:fillColor="#7C5CBF"
+        android:pathData="M53,82 L55,82 L54,86 Z" />
 
+    <!-- Eyes -->
     <path
-        android:fillColor="#38BDF8"
-        android:pathData="M42,41 A1.8,1.8 0 1,1 42,41.01 Z" />
+        android:fillColor="#2B2438"
+        android:pathData="M48,47 A2,2 0 1,1 48,47.01 Z" />
     <path
-        android:fillColor="#38BDF8"
-        android:pathData="M66,41 A1.8,1.8 0 1,1 66,41.01 Z" />
+        android:fillColor="#2B2438"
+        android:pathData="M60,47 A2,2 0 1,1 60,47.01 Z" />
 
-    <!-- Bee Head -->
+    <!-- Antennae -->
     <path
-        android:fillColor="#1E202C"
-        android:strokeColor="#F5C542"
-        android:strokeWidth="1.5"
-        android:pathData="M54,42 C48,42 48,49 54,49 C60,49 60,42 54,42 Z" />
-
-    <!-- Dual Sensor Eyes (Cyan) -->
-    <path
-        android:fillColor="#38BDF8"
-        android:pathData="M51,45.5 A1.2,1.2 0 1,1 51,45.51 Z" />
-    <path
-        android:fillColor="#38BDF8"
-        android:pathData="M57,45.5 A1.2,1.2 0 1,1 57,45.51 Z" />
-
-    <!-- Bee Thorax (Honey Gold Core) -->
-    <path
-        android:fillColor="#F5C542"
-        android:pathData="M49,50 C49,49 59,49 59,50 C60,55 60,57 59,60 C57,60.5 51,60.5 49,60 C48,57 48,55 49,50 Z" />
-
-    <!-- Carbon Dark Stripes -->
-    <path
-        android:strokeColor="#151722"
-        android:strokeWidth="1.8"
-        android:strokeLineCap="round"
-        android:pathData="M50,53 L58,53" />
-    <path
-        android:strokeColor="#151722"
-        android:strokeWidth="1.8"
-        android:strokeLineCap="round"
-        android:pathData="M50.5,57 L57.5,57" />
-
-    <!-- Abdomen & Stinger Tip -->
-    <path
-        android:fillColor="#F5C542"
-        android:pathData="M51,61 C51,61 54,71 54,72 C54,71 57,61 57,61 Z" />
-    <path
-        android:strokeColor="#151722"
+        android:strokeColor="#7C5CBF"
         android:strokeWidth="1.5"
         android:strokeLineCap="round"
-        android:pathData="M52,64 L56,64" />
-
-    <!-- Glowing Heart Core -->
+        android:pathData="M50,42 C48,36 44,36 44,37" />
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,54.5 A1.2,1.2 0 1,1 54,54.51 Z" />
+        android:strokeColor="#7C5CBF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M58,42 C60,36 64,36 64,37" />
 </vector>

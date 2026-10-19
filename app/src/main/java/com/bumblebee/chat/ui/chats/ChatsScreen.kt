@@ -1,7 +1,6 @@
 package com.bumblebee.chat.ui.chats
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,11 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.CellTower
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.WifiTethering
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,7 +57,6 @@ import com.bumblebee.chat.core.theme.BumblebeeSurface
 import com.bumblebee.chat.core.theme.BumblebeeTextPrimary
 import com.bumblebee.chat.core.theme.BumblebeeTextSecondary
 import com.bumblebee.chat.domain.model.Conversation
-import com.bumblebee.chat.ui.components.BumblebeeLogo
 import com.bumblebee.chat.ui.components.HexagonAvatar
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -76,6 +70,7 @@ fun ChatsScreen(
     viewModel: ChatsViewModel = hiltViewModel()
 ) {
     val conversations by viewModel.conversations.collectAsState()
+
     var showCreateHiveDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -83,49 +78,23 @@ fun ChatsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        BumblebeeLogo(size = 30.dp)
-
-                        Column {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = "Bumblebee",
-                                    style = MaterialTheme.typography.titleLarge.copy(
-                                        fontWeight = FontWeight.Black,
-                                        color = BumblebeeTextPrimary,
-                                        fontSize = 20.sp
-                                    )
-                                )
-                            }
-                            // Live Mesh Status Pill
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(6.dp)
-                                        .background(BumblebeeOnlineDot, CircleShape)
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Text(
-                                    text = "OFFLINE MESH ACTIVE",
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = BumblebeePrimaryDark,
-                                        fontSize = 9.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        letterSpacing = 0.5.sp
-                                    )
-                                )
-                            }
-                        }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Chats",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = BumblebeeTextPrimary
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "\uD83D\uDC1D", fontSize = 20.sp)
                     }
                 },
                 actions = {
                     IconButton(onClick = onNavigateToNearby) {
                         Icon(
-                            imageVector = Icons.Outlined.WifiTethering,
-                            contentDescription = "Radar Scan",
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = "Search Nearby",
                             tint = BumblebeePrimaryDark
                         )
                     }
@@ -144,7 +113,7 @@ fun ChatsScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "New Hive Group"
+                    contentDescription = "New Hive"
                 )
             }
         }
@@ -160,9 +129,8 @@ fun ChatsScreen(
                 }
             )
         }
-
         if (conversations.isEmpty()) {
-            // High-Tech Venture Grade Empty State
+            // Friendly Empty State with Sleepy Bee
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -173,36 +141,22 @@ fun ChatsScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 32.dp),
+                        .padding(horizontal = 36.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Pulsing Radar Beacon Graphic
-                    Box(
-                        modifier = Modifier
-                            .size(110.dp)
-                            .background(
-                                color = BumblebeePrimary.copy(alpha = 0.08f),
-                                shape = CircleShape
-                            )
-                            .border(
-                                width = 1.dp,
-                                color = BumblebeePrimary.copy(alpha = 0.25f),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        BumblebeeLogo(size = 56.dp, showPulseRings = true)
-                    }
+                    Text(
+                        text = "\uD83D\uDCA4\uD83D\uDC1D",
+                        fontSize = 64.sp
+                    )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(18.dp))
 
                     Text(
-                        text = "Your Hive is Ready",
-                        style = MaterialTheme.typography.titleLarge.copy(
+                        text = "The Hive is quiet...",
+                        style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            color = BumblebeeTextPrimary,
-                            fontSize = 20.sp
+                            color = BumblebeeTextPrimary
                         ),
                         textAlign = TextAlign.Center
                     )
@@ -210,38 +164,13 @@ fun ChatsScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "No cellular data or internet needed. Devices in physical Bluetooth and Wi-Fi range will appear as neighbors automatically.",
+                        text = "No offline conversations yet. Open the Honeycomb tab to discover nearby phones and start buzzing!",
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = BumblebeeTextSecondary,
-                            lineHeight = 22.sp,
-                            fontSize = 13.sp
+                            lineHeight = 22.sp
                         ),
                         textAlign = TextAlign.Center
                     )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Button(
-                        onClick = onNavigateToNearby,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = BumblebeePrimaryDark,
-                            contentColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(14.dp),
-                        modifier = Modifier.height(48.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.WifiTethering,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Discover Nearby Phones",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        )
-                    }
                 }
             }
         } else {
@@ -251,7 +180,7 @@ fun ChatsScreen(
                     .padding(paddingValues)
                     .background(BumblebeeBackground)
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(conversations, key = { it.conversationId }) { conversation ->
                     ConversationItem(
@@ -276,7 +205,7 @@ private fun ConversationItem(
     val formattedTime = timeFormatter.format(Date(conversation.lastMessageTimestamp))
 
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = BumblebeeSurface),
         border = androidx.compose.foundation.BorderStroke(1.dp, BumblebeeOutline),
         modifier = Modifier
@@ -301,7 +230,6 @@ private fun ConversationItem(
                             .size(12.dp)
                             .clip(CircleShape)
                             .background(BumblebeeOnlineDot)
-                            .border(2.dp, BumblebeeSurface, CircleShape)
                     )
                 }
             }
@@ -315,11 +243,10 @@ private fun ConversationItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = conversation.peerName ?: conversation.hiveName ?: "Nearby Neighbor",
-                        style = MaterialTheme.typography.titleMedium.copy(
+                        text = conversation.peerName ?: conversation.hiveName ?: "Nearby Bee",
+                        style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = BumblebeeTextPrimary,
-                            fontSize = 15.sp
+                            color = BumblebeeTextPrimary
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -330,8 +257,7 @@ private fun ConversationItem(
                         text = formattedTime,
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = BumblebeeTextSecondary,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium
+                            fontSize = 11.sp
                         )
                     )
                 }
@@ -344,11 +270,10 @@ private fun ConversationItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = conversation.lastMessage ?: "Tap to open radio line",
+                        text = conversation.lastMessage ?: "Tap to start conversation",
                         style = MaterialTheme.typography.bodySmall.copy(
                             color = if (conversation.unreadCount > 0) BumblebeeTextPrimary else BumblebeeTextSecondary,
-                            fontWeight = if (conversation.unreadCount > 0) FontWeight.SemiBold else FontWeight.Normal,
-                            fontSize = 13.sp
+                            fontWeight = if (conversation.unreadCount > 0) FontWeight.SemiBold else FontWeight.Normal
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
