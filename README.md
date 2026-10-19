@@ -28,6 +28,7 @@ Designed for off-grid scenarios such as natural disasters, remote hiking, flight
 - **Direct Messaging**: One-on-one instant messaging with real-time delivery state tracking (`Sending`, `Sent`, `Delivered`, `Read`).
 - **Live Radio Telemetry**: Tap connection status to inspect carrier protocol, mesh hop distance, packet throughput, and air-gap security metrics in real time.
 - **Honeycomb Discovery Radar**: Real-time visual discovery of nearby devices with 4-digit mutual authentication codes for secure pairing.
+- **Venture-Grade Vector UI/UX**: Precision-crafted vector emblem, animated splash screen with concentric radio waves, real-time rotating radar beam sweep in Honeycomb discovery, and elevated Material 3 design system with zero raw emoji placeholders.
 - **Enhanced Emergency SOS Buzz**: Offline distress beacon that broadcasts urgent alerts with Google Maps GPS coordinates link and device battery level telemetry to all peers in range.
 - **Privacy by Design**: No cloud servers, no account registration, no telemetry, and no centralized data collection. All chat history and media remain encrypted and stored strictly on the local device.
 
@@ -44,6 +45,7 @@ Designed for off-grid scenarios such as natural disasters, remote hiking, flight
 | **Message Deduplication** | **Implemented** | Database ID Guard in `ChatRepository` | Verified; duplicate network frames discarded safely |
 | **Push-To-Talk Voice Notes** | **Implemented** | AAC-LC (22.05 kHz / 32 kbps) Chunked | Verified audio recording, transmission, & waveform playback |
 | **HD Photo Sharing (1280px)** | **Implemented** | Nectar Chunking Engine (18 KB slices) | Verified high-res image reconstruction with zero artifacts |
+| **Vector UI/UX & Radar Sweep** | **Implemented** | Jetpack Compose + Canvas Animations | Vector brand logo, animated radio rings, radar cockpit, dark slate & honey palette |
 | **4-Digit Mutual PIN Verification** | **Implemented** | UKEY2 Short Authentication String (SAS) | Verified visual confirmation on both screens before pairing |
 | **Emergency SOS Beacon** | **Implemented** | Nearby Broadcast + GPS & Battery Telemetry | Verified broadcast with Google Maps link & battery status |
 | **Multi-Hop Relay Routing** | **Experimental (Roadmap)** | Multi-Hop Store-and-Forward | Protocol fields defined (`hopCount`, `maxHops`); 3-device relay in development |
@@ -122,7 +124,7 @@ app/src/main/java/com/bumblebee/chat/
     ├── buzz/                      # Emergency SOS beacon screen & ViewModel
     ├── chat/                      # Direct chat screen, message bubbles, photo viewer
     ├── chats/                     # Conversations list screen & ViewModel
-    ├── components/                # Reusable Compose widgets (HexagonAvatar, dialogs)
+    ├── components/                # Reusable Compose widgets (BumblebeeLogo, HexagonAvatar, dialogs)
     ├── navigation/                # Compose Navigation graph & routes
     ├── nearby/                    # Honeycomb radar discovery screen & ViewModel
     ├── onboarding/                # Initial setup screen & ViewModel

@@ -87,16 +87,35 @@ fun BuzzScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "Emergency Buzz",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = BumblebeeError
-                            )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = BumblebeeError,
+                            modifier = Modifier.size(22.dp)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "🚨", fontSize = 18.sp)
+                        Column {
+                            Text(
+                                text = "Emergency Buzz",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Black,
+                                    color = BumblebeeError,
+                                    fontSize = 19.sp
+                                )
+                            )
+                            Text(
+                                text = "OFFLINE DISTRESS BEACON",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = BumblebeeTextSecondary,
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.5.sp
+                                )
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

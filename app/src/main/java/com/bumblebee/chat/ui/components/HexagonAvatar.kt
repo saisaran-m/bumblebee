@@ -8,10 +8,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -20,6 +22,10 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * Modern venture-grade Hexagonal Avatar with 3D gradient surface,
+ * inner bevel stroke, and vector emblem integration.
+ */
 @Composable
 fun HexagonAvatar(
     emoji: String,
@@ -28,36 +34,69 @@ fun HexagonAvatar(
     emojiSize: TextUnit = (size.value * 0.45f).sp,
     modifier: Modifier = Modifier
 ) {
+    val isDefaultBee = emoji == "\uD83D\uDC1D" || emoji == "🐝"
+
     Box(
         modifier = modifier.size(size),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.size(size)) {
             drawHexagonShadow(this.size.width, this.size.height)
-            drawHexagon(this.size.width, this.size.height, color)
+            drawHexagonGradient(this.size.width, this.size.height, color)
+            drawHexagonBorder(this.size.width, this.size.height)
         }
 
-        Text(
-            text = emoji,
-            fontSize = emojiSize
-        )
+        if (isDefaultBee) {
+            BumblebeeLogo(
+                size = size * 0.55f,
+                showPulseRings = false
+            )
+        } else {
+            Text(
+                text = emoji,
+                fontSize = emojiSize
+            )
+        }
     }
 }
 
 private fun DrawScope.drawHexagonShadow(width: Float, height: Float) {
     val shadowPath = createHexagonPath(
         centerX = width / 2f,
-        centerY = height / 2f + 2.dp.toPx(),
-        radius = width / 2f * 0.92f
+        centerY = height / 2f + 3.dp.toPx(),
+        radius = width / 2f * 0.90f
     )
     drawPath(
         path = shadowPath,
-        color = Color.Black.copy(alpha = 0.08f),
+        color = Color.Black.copy(alpha = 0.12f),
         style = Fill
     )
 }
 
-private fun DrawScope.drawHexagon(width: Float, height: Float, color: Color) {
+private fun DrawScope.drawHexagonGradient(width: Float, height: Float, baseColor: Color) {
+    val hexPath = createHexagonPath(
+        centerX = width / 2f,
+        centerY = height / 2f,
+        radius = width / 2f * 0.88f
+    )
+    // Tonal gradient giving depth
+    val gradient = Brush.linearGradient(
+        colors = listOf(
+            baseColor.copy(alpha = 0.95f),
+            baseColor,
+            baseColor.copy(alpha = 0.85f)
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(width, height)
+    )
+    drawPath(
+        path = hexPath,
+        brush = gradient,
+        style = Fill
+    )
+}
+
+private fun DrawScope.drawHexagonBorder(width: Float, height: Float) {
     val hexPath = createHexagonPath(
         centerX = width / 2f,
         centerY = height / 2f,
@@ -65,8 +104,8 @@ private fun DrawScope.drawHexagon(width: Float, height: Float, color: Color) {
     )
     drawPath(
         path = hexPath,
-        color = color,
-        style = Fill
+        color = Color.White.copy(alpha = 0.25f),
+        style = Stroke(width = 1.2.dp.toPx())
     )
 }
 
